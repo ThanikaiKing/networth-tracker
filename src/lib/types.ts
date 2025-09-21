@@ -123,3 +123,61 @@ export interface PerformanceHighlights {
   bestMonth: PerformanceHighlight;
   worstMonth: PerformanceHighlight;
 }
+
+// Enhanced chart component props
+export interface AssetAllocationChartProps {
+  data: NetWorthEntry[];
+  isLoading: boolean;
+}
+
+export interface AssetGrowthChartProps {
+  data: NetWorthEntry[];
+  selectedPeriod: string;
+  isLoading: boolean;
+}
+
+export interface DebtTrackingChartProps {
+  data: NetWorthEntry[];
+  selectedPeriod: string;
+  isLoading: boolean;
+}
+
+export interface DebtCompositionChartProps {
+  data: NetWorthEntry[];
+  isLoading: boolean;
+}
+
+// Chart grid layout props
+export interface ChartGridProps {
+  children: React.ReactNode;
+  columns?: 1 | 2 | 3;
+}
+
+// Detailed asset/debt information
+export interface DetailedBankAccount {
+  name: string;
+  values: number[];
+  currentValue: number;
+  growth: number;
+}
+
+export interface DetailedInvestment {
+  name: string;
+  values: number[];
+  currentValue: number;
+  growth: number;
+}
+
+export interface DetailedAsset {
+  name: string;
+  values: number[];
+  currentValue: number;
+  growth: number;
+}
+
+export interface DetailedDebt {
+  name: string;
+  values: number[];
+  currentValue: number;
+  reduction: number;
+}

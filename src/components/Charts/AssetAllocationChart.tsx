@@ -8,7 +8,8 @@ import {
   ArcElement,
   Tooltip,
   Legend,
-  Plugin
+  Plugin,
+  TooltipItem
 } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { AssetAllocationChartProps } from '@/lib/types';
@@ -141,17 +142,17 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
           font: {
             size: 12,
           },
-          generateLabels: (chart: any) => {
+          generateLabels: (chart: ChartJS) => {
             const data = chart.data;
-            if (data.labels.length && data.datasets.length) {
-              return data.labels.map((label: string, i: number) => {
-                const value = data.datasets[0].data[i];
+            if (data.labels?.length && data.datasets.length) {
+              return (data.labels as string[]).map((label: string, i: number) => {
+                const value = (data.datasets[0].data[i] as number) || 0;
                 const percentage = allocationData[i]?.percentage || 0;
                 return {
                   text: `${label}\n${formatCurrency(value)} (${percentage.toFixed(1)}%)`,
-                  fillStyle: data.datasets[0].backgroundColor[i],
-                  strokeStyle: data.datasets[0].borderColor[i],
-                  lineWidth: data.datasets[0].borderWidth,
+                  fillStyle: (data.datasets[0].backgroundColor as string[])?.[i] || '#000000',
+                  strokeStyle: (data.datasets[0].borderColor as string[])?.[i] || '#000000',
+                  lineWidth: (typeof data.datasets[0].borderWidth === 'number' ? data.datasets[0].borderWidth : 1),
                   hidden: false,
                   index: i,
                 };
@@ -170,7 +171,7 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
         cornerRadius: 8,
         displayColors: true,
         callbacks: {
-          label: (context: any) => {
+          label: (context: TooltipItem<'doughnut'>) => {
             const label = context.label || '';
             const value = context.parsed;
             const percentage = ((value / latestEntry.totalAssets) * 100).toFixed(1);

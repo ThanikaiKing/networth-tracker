@@ -10,6 +10,11 @@ import { ErrorDisplay } from '@/components/common/ErrorBoundary';
 import { MetricsCards } from './MetricsCards';
 import { NetWorthChart } from './NetWorthChart';
 import { ResponsivePeriodSelector } from './PeriodSelector';
+import { ChartGrid, ChartSection } from './ChartGrid';
+import { AssetAllocationChart } from '@/components/Charts/AssetAllocationChart';
+import { AssetGrowthChart } from '@/components/Charts/AssetGrowthChart';
+import { DebtTrackingChart } from '@/components/Charts/DebtTrackingChart';
+import { DebtCompositionChart } from '@/components/Charts/DebtCompositionChart';
 
 const AVAILABLE_PERIODS: TimePeriod[] = ['all', '6months', '3months', '1month'];
 
@@ -63,7 +68,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
               isLoading={loading}
             />
 
-            {/* Chart Section */}
+            {/* Main Net Worth Chart Section */}
             <div className="mb-8">
               <NetWorthChart
                 data={data?.entries || []}
@@ -71,6 +76,44 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
                 isLoading={loading}
               />
             </div>
+
+            {/* Asset Analysis Section */}
+            <ChartSection 
+              title="Asset Analysis"
+              description="Breakdown and growth analysis of your asset portfolio"
+              className="mb-8"
+            >
+              <ChartGrid columns={2}>
+                <AssetAllocationChart
+                  data={data?.entries || []}
+                  isLoading={loading}
+                />
+                <AssetGrowthChart
+                  data={data?.entries || []}
+                  selectedPeriod={selectedPeriod}
+                  isLoading={loading}
+                />
+              </ChartGrid>
+            </ChartSection>
+
+            {/* Debt Analysis Section */}
+            <ChartSection 
+              title="Debt Analysis"
+              description="Track your debt reduction progress and composition"
+              className="mb-8"
+            >
+              <ChartGrid columns={2}>
+                <DebtTrackingChart
+                  data={data?.entries || []}
+                  selectedPeriod={selectedPeriod}
+                  isLoading={loading}
+                />
+                <DebtCompositionChart
+                  data={data?.entries || []}
+                  isLoading={loading}
+                />
+              </ChartGrid>
+            </ChartSection>
 
             {/* Additional content area */}
             {children && (

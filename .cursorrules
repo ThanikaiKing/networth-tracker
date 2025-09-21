@@ -1,0 +1,31 @@
+# Net Worth Dashboard - Cursor Rules
+
+## Code Quality & TypeScript
+- Never use `Math.random()` or any non-deterministic values in components that render on both server and client (prevents hydration errors)
+- Use static arrays/values instead of random generation in skeleton loaders
+- Always use proper Chart.js types instead of `any`:
+  - `TooltipItem<'line'|'doughnut'|'bar'>` for tooltip callbacks
+  - `ChartJS` for chart instances  
+  - `string | number` for value callbacks
+- For Chart.js font weights: use numeric values (500) not strings ('500')
+- Always add proper null checks with optional chaining (`data.labels?.length`)
+- Use type assertions safely with fallbacks: `(data.something as Type) || fallback`
+
+## Canvas & Chart.js Specifics
+- For canvas center positioning, use `chartArea` coordinates not full canvas dimensions
+- Always save/restore canvas context in proper order: `ctx.save()` → draw → `ctx.restore()`
+- When creating chart plugins, use factory functions that accept parameters instead of global constants
+
+## Git Workflow Rule
+**MANDATORY**: When user asks to "commit and push":
+1. ALWAYS run `npm run build` first
+2. Fix any TypeScript/ESLint errors before committing
+3. Only proceed with git add/commit/push after successful build
+4. Never commit code that doesn't pass build validation
+
+## Type Safety Checklist
+- Replace all `any` types with specific interfaces
+- Add null checks for potentially undefined chart data
+- Cast arrays with proper types: `(array as Type[])`
+- Handle Chart.js data types that can be null/undefined
+- Ensure callback functions match expected Chart.js signatures

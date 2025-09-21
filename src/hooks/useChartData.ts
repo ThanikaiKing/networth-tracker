@@ -113,7 +113,7 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
             color: 'rgb(107, 114, 128)', // Gray-500
             font: {
               size: 12,
-              weight: '500' as const,
+              weight: 500,
             },
           },
           ticks: {
@@ -136,7 +136,7 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
             color: 'rgb(107, 114, 128)', // Gray-500
             font: {
               size: 12,
-              weight: '500' as const,
+              weight: 500,
             },
           },
           ticks: {
