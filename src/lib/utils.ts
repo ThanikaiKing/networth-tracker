@@ -20,14 +20,14 @@ export const SHEET_ROWS = {
   BANK_ACCOUNTS_END: 9,   // Row 10 (Zerodha funds)
   BANK_SUBTOTAL: 17, // Row 18
   
-  // Investment Accounts (rows 22-29)
+  // Investment Accounts (rows 22-32) - now includes all investments
   INVESTMENT_ACCOUNTS_START: 21, // Row 22 (Equity)
-  INVESTMENT_ACCOUNTS_END: 28,   // Row 29 (Walmart shares)
+  INVESTMENT_ACCOUNTS_END: 31,   // Row 32 (Aston grey) - expanded to include real estate
   INVESTMENT_SUBTOTAL: 35, // Row 36
   
-  // Other Assets (rows 40-42)
-  ASSETS_START: 39, // Row 40 (Edyar land)
-  ASSETS_END: 41,   // Row 42 (Aston grey)
+  // Other Assets (now empty since real estate moved to investments)
+  ASSETS_START: 39, // Row 40 
+  ASSETS_END: 41,   // Row 42 (but all empty now)
   ASSETS_SUBTOTAL: 50, // Row 51
   
   // Debt (rows 55-56)
@@ -93,10 +93,11 @@ export const extractBankAccounts = (rawData: string[][], dateHeaders: string[]):
   return accounts;
 };
 
-// Extract individual investment accounts from the sheet
+// Extract individual investment accounts from the sheet (now includes all investments including real estate)
 export const extractInvestmentAccounts = (rawData: string[][], dateHeaders: string[]): InvestmentAccount[] => {
   const accounts: InvestmentAccount[] = [];
   
+  // Extract all investment accounts (rows 22-32, now includes real estate)
   for (let rowIndex = SHEET_ROWS.INVESTMENT_ACCOUNTS_START; rowIndex <= SHEET_ROWS.INVESTMENT_ACCOUNTS_END; rowIndex++) {
     const row = rawData[rowIndex];
     if (!row) continue;

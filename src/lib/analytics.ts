@@ -151,7 +151,9 @@ export const categorizeInvestment = (name: string): InvestmentCategory => {
   }
   
   if (lowerName.includes('gold') || lowerName.includes('real estate') || 
-      lowerName.includes('land') || lowerName.includes('commodity')) {
+      lowerName.includes('land') || lowerName.includes('commodity') ||
+      lowerName.includes('bhive') || lowerName.includes('aston grey') ||
+      lowerName.includes('edyar')) {
     return 'alternative';
   }
   

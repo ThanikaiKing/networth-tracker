@@ -66,11 +66,12 @@ Based on the provided CSV export, your sheet has the following structure:
    - FD (Fixed Deposit)
    - BetterInvest
    - Walmart shares
+   - **Edyar land** (Real estate - Own home construction)
+   - **Bhive** (Commercial real estate - LLP partner, ~18% returns)
+   - **Aston grey** (Commercial real estate - LLP partner, ~18% returns)
 
 3. **Other Assets** (Subtotal row 51):
-   - Edyar land
-   - Bhive
-   - Aston grey
+   - (Real estate assets moved to Investment Accounts)
 
 4. **Debt** (Subtotal row 66):
    - Home loan
