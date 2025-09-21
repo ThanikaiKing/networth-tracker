@@ -53,7 +53,6 @@ export const PeriodSelectorDropdown: React.FC<PeriodSelectorProps> = ({
     availablePeriods.includes(option.value)
   );
 
-  const selectedOption = filteredOptions.find(option => option.value === selectedPeriod);
 
   return (
     <div className="relative">

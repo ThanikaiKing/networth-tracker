@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error in /api/sheets/networth:', error);
     
     const errorResponse: ApiResponse<DashboardData> = {

@@ -13,7 +13,7 @@ export class GoogleSheetsService {
   /**
    * Fetch raw data from Google Sheets API
    */
-  async fetchData(): Promise<any[][]> {
+  async fetchData(): Promise<unknown[][]> {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.config.spreadsheetId}/values/${this.config.range}?key=${this.config.apiKey}`;
     
     try {
@@ -44,9 +44,9 @@ export class GoogleSheetsService {
   /**
    * Transform raw sheet data into structured NetWorthEntry objects
    */
-  async transformData(rawData: any[][]): Promise<NetWorthEntry[]> {
+  async transformData(rawData: unknown[][]): Promise<NetWorthEntry[]> {
     try {
-      const entries = extractNetWorthData(rawData);
+      const entries = extractNetWorthData(rawData as string[][]);
       
       if (!validateNetWorthData(entries)) {
         throw new Error('Invalid data structure received from Google Sheets');
@@ -121,22 +121,24 @@ export const createSheetsService = (): GoogleSheetsService => {
 /**
  * Helper function to handle API errors
  */
-export const handleSheetsError = (error: any): string => {
-  if (error.message?.includes('API key')) {
+export const handleSheetsError = (error: unknown): string => {
+  const errorMessage = error instanceof Error ? error.message : '';
+  
+  if (errorMessage.includes('API key')) {
     return 'Invalid API key. Please check your Google Sheets API configuration.';
   }
   
-  if (error.message?.includes('spreadsheet')) {
+  if (errorMessage.includes('spreadsheet')) {
     return 'Spreadsheet not found. Please check the spreadsheet ID.';
   }
   
-  if (error.message?.includes('range')) {
+  if (errorMessage.includes('range')) {
     return 'Invalid range specified. Please check the sheet name and range.';
   }
   
-  if (error.message?.includes('quota')) {
+  if (errorMessage.includes('quota')) {
     return 'API quota exceeded. Please try again later.';
   }
   
-  return error.message || 'An unknown error occurred while fetching data.';
+  return errorMessage || 'An unknown error occurred while fetching data.';
 };

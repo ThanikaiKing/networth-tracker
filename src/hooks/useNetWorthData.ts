@@ -45,9 +45,9 @@ export const useNetWorthData = (period: TimePeriod = 'all'): UseNetWorthDataRetu
       }
 
       setData(result.data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error fetching net worth data:', err);
-      setError(err.message || 'Failed to fetch data');
+      setError(err instanceof Error ? err.message : 'Failed to fetch data');
     } finally {
       setLoading(false);
     }

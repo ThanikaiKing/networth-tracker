@@ -75,18 +75,18 @@ export interface MetricsCardsProps {
 
 export interface NetWorthChartProps {
   data: NetWorthEntry[];
-  selectedPeriod: string;
+  selectedPeriod: TimePeriod;
   isLoading: boolean;
 }
 
 export interface PeriodSelectorProps {
-  selectedPeriod: string;
-  onPeriodChange: (period: string) => void;
-  availablePeriods: string[];
+  selectedPeriod: TimePeriod;
+  onPeriodChange: (period: TimePeriod) => void;
+  availablePeriods: TimePeriod[];
 }
 
 export interface DashboardLayoutProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 // Chart data structure

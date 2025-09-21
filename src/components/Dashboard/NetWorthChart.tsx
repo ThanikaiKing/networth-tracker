@@ -41,9 +41,10 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
 
   // Cleanup chart on unmount
   useEffect(() => {
+    const chart = chartRef.current;
     return () => {
-      if (chartRef.current) {
-        chartRef.current.destroy();
+      if (chart) {
+        chart.destroy();
       }
     };
   }, []);

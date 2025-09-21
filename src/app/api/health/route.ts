@@ -69,7 +69,7 @@ export async function GET() {
       return NextResponse.json(unhealthyResponse, { status: 503 });
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Health check error:', error);
     
     const errorResponse: ApiResponse<HealthCheckResponse> = {
@@ -78,7 +78,7 @@ export async function GET() {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
         sheetsConnection: false,
-        message: `Health check failed: ${error.message}`,
+        message: `Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       },
     };
 

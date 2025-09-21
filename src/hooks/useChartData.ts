@@ -10,7 +10,20 @@ interface UseChartDataReturn {
   values: number[];
   minValue: number;
   maxValue: number;
-  chartConfig: any; // Chart.js configuration object
+  chartConfig: {
+    type: 'line';
+    data: {
+      labels: string[];
+      datasets: Array<{
+        label: string;
+        data: number[];
+        [key: string]: unknown;
+      }>;
+    };
+    options: {
+      [key: string]: unknown;
+    };
+  };
 }
 
 export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
@@ -77,10 +90,10 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
           cornerRadius: 8,
           displayColors: false,
           callbacks: {
-            title: function(context: any) {
+            title: function(context: Array<{ label?: string }>) {
               return context[0]?.label || '';
             },
-            label: function(context: any) {
+            label: function(context: { parsed: { y: number } }) {
               const value = context.parsed.y;
               return `Net Worth: ${new Intl.NumberFormat('en-IN', {
                 style: 'currency',
@@ -131,7 +144,7 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
             font: {
               size: 11,
             },
-            callback: function(value: any) {
+            callback: function(value: string | number) {
               // Format large numbers with K/M/Cr suffixes
               const num = typeof value === 'number' ? value : parseFloat(value);
               if (num >= 10000000) { // 1 crore
