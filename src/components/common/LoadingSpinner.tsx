@@ -50,17 +50,20 @@ export const SkeletonCard: React.FC<{ className?: string }> = ({ className }) =>
 
 // Skeleton loader for chart
 export const SkeletonChart: React.FC<{ className?: string }> = ({ className }) => {
+  // Static heights to prevent hydration mismatch
+  const barHeights = ['60%', '45%', '75%', '40%', '55%', '80%'];
+  
   return (
     <div className={cn('bg-white rounded-lg p-6 shadow-sm border', className)}>
       <div className="animate-pulse">
         <div className="h-6 bg-gray-200 rounded w-1/4 mb-6"></div>
         <div className="h-64 bg-gray-100 rounded-lg flex items-end justify-center space-x-2 p-4">
-          {[...Array(6)].map((_, i) => (
+          {barHeights.map((height, i) => (
             <div
               key={i}
               className="bg-gray-200 rounded-t"
               style={{
-                height: `${Math.random() * 60 + 40}%`,
+                height,
                 width: '12%',
               }}
             />
