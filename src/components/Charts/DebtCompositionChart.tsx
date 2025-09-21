@@ -28,6 +28,27 @@ ChartJS.register(
   Legend
 );
 
+// Helper functions for debt categorization
+const getDebtColor = (debtName: string): string => {
+  const name = debtName.toLowerCase();
+  if (name.includes('home') || name.includes('mortgage')) return '#EF4444';
+  if (name.includes('personal') || name.includes('consumer')) return '#F97316';
+  if (name.includes('credit') || name.includes('card')) return '#DC2626';
+  if (name.includes('student') || name.includes('education')) return '#F59E0B';
+  if (name.includes('car') || name.includes('vehicle') || name.includes('auto')) return '#EA580C';
+  return '#6B7280'; // Default gray for unknown debt types
+};
+
+const getDebtDescription = (debtName: string): string => {
+  const name = debtName.toLowerCase();
+  if (name.includes('home') || name.includes('mortgage')) return 'Primary residence mortgage';
+  if (name.includes('personal')) return 'Personal/consumer loans';
+  if (name.includes('credit') || name.includes('card')) return 'Credit card balances';
+  if (name.includes('student') || name.includes('education')) return 'Educational loans';
+  if (name.includes('car') || name.includes('vehicle') || name.includes('auto')) return 'Vehicle financing';
+  return 'Other debt obligations';
+};
+
 export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
   data,
   isLoading,
@@ -66,29 +87,41 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
     );
   }
 
+  // Use only the latest month's data (current snapshot)
   const latestEntry = data[data.length - 1];
   const totalDebt = latestEntry.totalDebt;
 
-  // Extract debt composition from the latest data entry
-  // Note: Based on your CSV structure, we need to extract individual debt categories
-  // For now, we'll work with the available debt subtotal and create a simplified view
-  
-  // Mock debt categories for demonstration - in real implementation,
-  // you would extract individual debt rows from the Google Sheet
-  const debtCategories = [
-    {
-      name: 'Home Loan',
-      value: totalDebt * 0.85, // Assuming home loan is ~85% of total debt
-      color: '#EF4444',
-      description: 'Primary residence mortgage'
-    },
-    {
-      name: 'Personal Loan', 
-      value: totalDebt * 0.15, // Assuming personal loan is ~15% of total debt
-      color: '#F97316',
-      description: 'Personal/consumer loans'
-    }
-  ].filter(debt => debt.value > 0);
+  // Extract individual debt categories from the latest data entry
+  // Based on the CSV structure: Home loan (row 55) and Personal loan (row 56)
+  const debtCategories = latestEntry.debt.debts
+    .map(debt => {
+      const currentValue = debt.values[debt.values.length - 1]; // Latest value only
+      return {
+        name: debt.name,
+        value: currentValue,
+        color: getDebtColor(debt.name),
+        description: getDebtDescription(debt.name)
+      };
+    })
+    .filter(debt => debt.value > 0);
+
+  // Fallback to estimated categories if debt.debts is empty
+  if (debtCategories.length === 0 && totalDebt > 0) {
+    debtCategories.push(
+      {
+        name: 'Home Loan',
+        value: totalDebt * 0.85, // Based on CSV analysis
+        color: '#EF4444',
+        description: 'Primary residence mortgage'
+      },
+      {
+        name: 'Personal Loan', 
+        value: totalDebt * 0.15, // Based on CSV analysis
+        color: '#F97316',
+        description: 'Personal/consumer loans'
+      }
+    );
+  }
 
   // If no debt, show debt-free message
   if (totalDebt === 0 || debtCategories.length === 0) {

@@ -13,7 +13,7 @@ import {
 } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { AssetAllocationChartProps } from '@/lib/types';
-import { calculateAssetAllocation, calculateAllocationScore } from '@/lib/analytics';
+import { calculateAssetAllocation } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils';
 import { SkeletonChart } from '@/components/common/LoadingSpinner';
 
@@ -98,9 +98,8 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
 
   const latestEntry = data[data.length - 1];
   const allocationData = calculateAssetAllocation(latestEntry);
-  const { score, feedback } = calculateAllocationScore(allocationData);
 
-  if (allocationData.length === 0 || latestEntry.totalAssets === 0) {
+  if (latestEntry.totalAssets === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-96">
         <div className="flex items-center justify-center h-full">
@@ -115,13 +114,35 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
     );
   }
 
+  // Convert AssetAllocation object to array for chart
+  const assetCategories = [
+    { 
+      category: 'Bank Accounts', 
+      value: allocationData.bankAccounts, 
+      percentage: allocationData.bankAccounts,
+      color: '#3B82F6' 
+    },
+    { 
+      category: 'Investments', 
+      value: allocationData.investments, 
+      percentage: allocationData.investments,
+      color: '#10B981' 
+    },
+    { 
+      category: 'Other Assets', 
+      value: allocationData.otherAssets, 
+      percentage: allocationData.otherAssets,
+      color: '#F59E0B' 
+    },
+  ].filter(item => item.value > 0);
+
   const chartData = {
-    labels: allocationData.map(item => item.category),
+    labels: assetCategories.map(item => item.category),
     datasets: [
       {
-        data: allocationData.map(item => item.value),
-        backgroundColor: allocationData.map(item => item.color),
-        borderColor: allocationData.map(item => item.color),
+        data: assetCategories.map(item => item.value),
+        backgroundColor: assetCategories.map(item => item.color),
+        borderColor: assetCategories.map(item => item.color),
         borderWidth: 2,
         hoverBorderWidth: 4,
         hoverBorderColor: '#FFFFFF',
@@ -147,7 +168,7 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
             if (data.labels?.length && data.datasets.length) {
               return (data.labels as string[]).map((label: string, i: number) => {
                 const value = (data.datasets[0].data[i] as number) || 0;
-                const percentage = allocationData[i]?.percentage || 0;
+                const percentage = assetCategories[i]?.value || 0;
                 return {
                   text: `${label}\n${formatCurrency(value)} (${percentage.toFixed(1)}%)`,
                   fillStyle: (data.datasets[0].backgroundColor as string[])?.[i] || '#000000',
@@ -207,14 +228,11 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
           </p>
         </div>
         
-        {/* Allocation Score */}
+        {/* Total Assets */}
         <div className="text-right">
-          <div className="text-sm text-gray-600">Allocation Score</div>
-          <div className={`text-2xl font-bold ${
-            score >= 80 ? 'text-green-600' : 
-            score >= 60 ? 'text-yellow-600' : 'text-red-600'
-          }`}>
-            {score}/100
+          <div className="text-sm text-gray-600">Total Assets</div>
+          <div className="text-2xl font-bold text-blue-600">
+            {formatCurrency(latestEntry.totalAssets)}
           </div>
         </div>
       </div>
@@ -232,7 +250,7 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
       <div className="space-y-3">
         <div className="text-sm font-medium text-gray-700">Allocation Details:</div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {allocationData.map((item, index) => (
+          {assetCategories.map((item, index) => (
             <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
               <div 
                 className="w-4 h-4 rounded-full flex-shrink-0"
@@ -272,7 +290,7 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
           </svg>
           <div>
             <div className="text-sm font-medium text-blue-900">Allocation Insight</div>
-            <div className="text-sm text-blue-700">{feedback}</div>
+            <div className="text-sm text-blue-700">Diversify across different asset types for better risk management and growth potential.</div>
           </div>
         </div>
       </div>

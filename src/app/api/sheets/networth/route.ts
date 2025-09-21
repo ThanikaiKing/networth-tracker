@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createSheetsService, handleSheetsError } from '@/lib/sheets';
-import { filterDataByPeriod, generateMockData } from '@/lib/utils';
+import { filterDataByPeriod, calculateGrowthRate, calculateTotalGrowth } from '@/lib/utils';
 import { TimePeriod, ApiResponse, DashboardData } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
@@ -19,44 +19,38 @@ export async function GET(request: NextRequest) {
       process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
 
     if (!hasCredentials) {
-      console.log('Using mock data - Google Sheets credentials not configured');
-      
-      // Return mock data for development
-      const mockEntries = generateMockData();
-      const filteredEntries = filterDataByPeriod(mockEntries, period);
-      
-      const mockResponse: ApiResponse<DashboardData> = {
-        success: true,
-        data: {
-          entries: filteredEntries,
-          summary: {
-            currentNetWorth: filteredEntries[filteredEntries.length - 1].netWorth,
-            totalGrowth: filteredEntries[filteredEntries.length - 1].netWorth - filteredEntries[0].netWorth,
-            growthRate: 12.5, // Mock growth rate
-            period: `${filteredEntries[0].date} - ${filteredEntries[filteredEntries.length - 1].date}`,
-            currency: 'INR',
-          },
-        },
+      const errorResponse: ApiResponse<DashboardData> = {
+        success: false,
+        error: 'Google Sheets backend is not available. Please configure GOOGLE_SHEETS_API_KEY and GOOGLE_SHEETS_SPREADSHEET_ID environment variables.',
       };
-      
-      return NextResponse.json(mockResponse, { status: 200 });
+
+      return NextResponse.json(errorResponse, { status: 503 });
     }
 
-    // Use real Google Sheets API
+    // Fetch data from Google Sheets API
     const sheetsService = createSheetsService();
     const dashboardData = await sheetsService.getDashboardData();
     
     // Filter data based on period parameter
     const filteredEntries = filterDataByPeriod(dashboardData.entries, period);
     
-    // Recalculate summary for filtered data
+    // Recalculate summary statistics for filtered data
+    const currentNetWorth = filteredEntries.length > 0 ? filteredEntries[filteredEntries.length - 1].netWorth : 0;
+    const totalGrowth = filteredEntries.length >= 2 ? calculateTotalGrowth(filteredEntries) : 0;
+    const growthRate = filteredEntries.length >= 2 ? calculateGrowthRate(filteredEntries) : 0;
+    
     const filteredData: DashboardData = {
       entries: filteredEntries,
       summary: {
-        ...dashboardData.summary,
+        currentNetWorth,
+        totalGrowth,
+        growthRate,
         period: period === 'all' 
           ? dashboardData.summary.period 
-          : `${filteredEntries[0]?.date || ''} - ${filteredEntries[filteredEntries.length - 1]?.date || ''}`,
+          : (filteredEntries.length > 0 
+              ? `${filteredEntries[0].date} - ${filteredEntries[filteredEntries.length - 1].date}`
+              : 'No data'),
+        currency: dashboardData.summary.currency,
       },
     };
 

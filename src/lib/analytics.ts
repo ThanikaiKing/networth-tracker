@@ -1,314 +1,387 @@
-// Advanced analytics utilities for detailed financial analysis
+// Investment Analytics and Velocity Analysis
+// Functions to calculate investment performance metrics, growth rates, and consistency scores
 
-import { NetWorthEntry } from './types';
+import { 
+  InvestmentVelocity, 
+  InvestmentAnalytics, 
+  AssetClassAllocation, 
+  NetWorthEntry, 
+  DetailedInvestment,
+  InvestmentCategory,
+  RiskLevel,
+  InvestmentTrend
+} from './types';
 
-export interface AssetAllocationData {
-  category: string;
-  value: number;
-  percentage: number;
-  color: string;
-}
-
-export interface DebtAnalytics {
-  totalDebt: number;
-  debtToAssetRatio: number;
-  monthlyReduction: number;
-  projectedPayoffMonths?: number;
-}
-
-export interface PerformanceMetrics {
-  cagr: number;
-  volatility: number;
-  maxDrawdown: number;
-  bestMonth: { date: string; change: number };
-  worstMonth: { date: string; change: number };
-  averageMonthlyGrowth: number;
-}
-
-// Calculate asset allocation from the latest entry
-export const calculateAssetAllocation = (latestEntry: NetWorthEntry): AssetAllocationData[] => {
-  const total = latestEntry.totalAssets;
+/**
+ * Calculate investment velocity metrics for a single investment
+ */
+export const calculateInvestmentVelocity = (
+  investment: DetailedInvestment
+): InvestmentVelocity => {
+  const values = investment.values.filter(v => v > 0);
   
-  if (total === 0) return [];
-
-  const allocation = [
-    {
-      category: 'Bank Accounts',
-      value: latestEntry.bankAccounts.subtotal,
-      percentage: (latestEntry.bankAccounts.subtotal / total) * 100,
-      color: '#3B82F6' // Blue
-    },
-    {
-      category: 'Investments',
-      value: latestEntry.investments.subtotal,
-      percentage: (latestEntry.investments.subtotal / total) * 100,
-      color: '#10B981' // Green
-    },
-    {
-      category: 'Other Assets',
-      value: latestEntry.otherAssets.subtotal,
-      percentage: (latestEntry.otherAssets.subtotal / total) * 100,
-      color: '#8B5CF6' // Purple
-    }
-  ];
-
-  return allocation.filter(item => item.value > 0);
-};
-
-// Extract time-series data for asset categories
-export const extractAssetCategoryData = (entries: NetWorthEntry[]) => {
-  const dates = entries.map(entry => entry.date);
-  
-  return {
-    dates,
-    bankAccounts: entries.map(entry => entry.bankAccounts.subtotal),
-    investments: entries.map(entry => entry.investments.subtotal),
-    otherAssets: entries.map(entry => entry.otherAssets.subtotal)
-  };
-};
-
-// Calculate debt analytics
-export const calculateDebtAnalytics = (entries: NetWorthEntry[]): DebtAnalytics => {
-  if (entries.length === 0) {
+  if (values.length < 2) {
     return {
-      totalDebt: 0,
-      debtToAssetRatio: 0,
-      monthlyReduction: 0
+      name: investment.name,
+      currentValue: investment.currentValue,
+      growthRate: 0,
+      absoluteGrowth: 0,
+      consistencyScore: 0,
+      riskScore: 'low',
+      trend: 'stable',
+      monthlyReturns: []
     };
   }
 
-  const latest = entries[entries.length - 1];
-  const totalDebt = latest.totalDebt;
-  const debtToAssetRatio = (totalDebt / latest.totalAssets) * 100;
-  
-  // Calculate average monthly debt reduction
-  let monthlyReduction = 0;
-  if (entries.length > 1) {
-    const first = entries[0];
-    const periods = entries.length - 1;
-    monthlyReduction = (first.totalDebt - totalDebt) / periods;
-  }
+  // Calculate growth metrics
+  const initialValue = values[0];
+  const currentValue = values[values.length - 1];
+  const absoluteGrowth = currentValue - initialValue;
+  const growthRate = initialValue > 0 ? (absoluteGrowth / initialValue) * 100 : 0;
 
-  // Estimate payoff timeline (if debt is being reduced)
-  let projectedPayoffMonths: number | undefined;
-  if (monthlyReduction > 0 && totalDebt > 0) {
-    projectedPayoffMonths = Math.ceil(totalDebt / monthlyReduction);
-  }
-
-  return {
-    totalDebt,
-    debtToAssetRatio,
-    monthlyReduction,
-    projectedPayoffMonths
-  };
-};
-
-// Extract debt category data for visualization
-export const extractDebtCategoryData = (entries: NetWorthEntry[]) => {
-  const dates = entries.map(entry => entry.date);
-  const totalDebt = entries.map(entry => entry.totalDebt);
-  const debtToAssetRatio = entries.map(entry => 
-    (entry.totalDebt / entry.totalAssets) * 100
-  );
-
-  return {
-    dates,
-    totalDebt,
-    debtToAssetRatio
-  };
-};
-
-// Calculate compound annual growth rate
-export const calculateCAGR = (initialValue: number, finalValue: number, periods: number): number => {
-  if (periods === 0 || initialValue === 0) return 0;
-  return (Math.pow(finalValue / initialValue, 1 / periods) - 1) * 100;
-};
-
-// Calculate volatility (standard deviation of returns)
-export const calculateVolatility = (values: number[]): number => {
-  if (values.length < 2) return 0;
-  
-  const returns = values.slice(1).map((val, i) => (val - values[i]) / values[i]);
-  const meanReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
-  const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - meanReturn, 2), 0) / returns.length;
-  return Math.sqrt(variance) * 100;
-};
-
-// Calculate maximum drawdown
-export const calculateMaxDrawdown = (values: number[]): number => {
-  if (values.length < 2) return 0;
-  
-  let maxDrawdown = 0;
-  let peak = values[0];
-  
+  // Calculate monthly returns
+  const monthlyReturns: number[] = [];
   for (let i = 1; i < values.length; i++) {
-    if (values[i] > peak) {
-      peak = values[i];
-    } else {
-      const drawdown = ((peak - values[i]) / peak) * 100;
-      maxDrawdown = Math.max(maxDrawdown, drawdown);
+    if (values[i - 1] > 0) {
+      const monthlyReturn = ((values[i] - values[i - 1]) / values[i - 1]) * 100;
+      monthlyReturns.push(monthlyReturn);
     }
   }
-  
-  return maxDrawdown;
+
+  // Calculate consistency score (0-100, higher is more consistent)
+  const consistencyScore = calculateConsistencyScore(monthlyReturns);
+
+  // Determine risk score based on volatility
+  const riskScore = calculateRiskScore(monthlyReturns);
+
+  // Determine trend based on recent performance
+  const trend = determineTrend(monthlyReturns);
+
+  return {
+    name: investment.name,
+    currentValue,
+    growthRate,
+    absoluteGrowth,
+    consistencyScore,
+    riskScore,
+    trend,
+    monthlyReturns
+  };
 };
 
-// Get best and worst performing months
-export const getPerformanceHighlights = (entries: NetWorthEntry[]) => {
-  const validChanges = entries
-    .map((entry, index) => ({ 
-      date: entry.date, 
-      change: entry.monthOverMonthChange || 0,
-      index 
-    }))
-    .filter(item => item.change !== 0);
-    
-  if (validChanges.length === 0) {
+/**
+ * Calculate consistency score based on standard deviation of monthly returns
+ * Lower volatility = higher consistency score
+ */
+export const calculateConsistencyScore = (monthlyReturns: number[]): number => {
+  if (monthlyReturns.length < 2) return 0;
+
+  // Calculate mean return
+  const meanReturn = monthlyReturns.reduce((sum, ret) => sum + ret, 0) / monthlyReturns.length;
+
+  // Calculate standard deviation
+  const variance = monthlyReturns.reduce((sum, ret) => {
+    return sum + Math.pow(ret - meanReturn, 2);
+  }, 0) / monthlyReturns.length;
+
+  const standardDeviation = Math.sqrt(variance);
+
+  // Convert to consistency score (0-100)
+  // Lower standard deviation = higher consistency
+  const maxStdDev = 20; // Assume max reasonable std dev is 20%
+  const consistencyScore = Math.max(0, 100 - (standardDeviation / maxStdDev) * 100);
+
+  return Math.round(consistencyScore * 10) / 10; // Round to 1 decimal
+};
+
+/**
+ * Calculate risk score based on volatility
+ */
+export const calculateRiskScore = (monthlyReturns: number[]): RiskLevel => {
+  if (monthlyReturns.length < 2) return 'low';
+
+  const standardDeviation = calculateStandardDeviation(monthlyReturns);
+
+  // Risk classification based on monthly volatility
+  if (standardDeviation <= 5) return 'low';      // <= 5% monthly volatility
+  if (standardDeviation <= 15) return 'medium';  // 5-15% monthly volatility
+  return 'high';                                 // > 15% monthly volatility
+};
+
+/**
+ * Determine investment trend based on recent performance
+ */
+export const determineTrend = (monthlyReturns: number[]): InvestmentTrend => {
+  if (monthlyReturns.length < 2) return 'stable';
+
+  // Look at the last 3 months or all available data if less
+  const recentReturns = monthlyReturns.slice(-3);
+  const avgRecentReturn = recentReturns.reduce((sum, ret) => sum + ret, 0) / recentReturns.length;
+
+  if (avgRecentReturn > 5) return 'up';      // Average > 5% growth
+  if (avgRecentReturn < -2) return 'down';   // Average < -2% decline
+  return 'stable';                           // Between -2% and 5%
+};
+
+/**
+ * Calculate standard deviation helper function
+ */
+export const calculateStandardDeviation = (values: number[]): number => {
+  if (values.length < 2) return 0;
+
+  const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+  const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+  
+  return Math.sqrt(variance);
+};
+
+/**
+ * Categorize investments into asset classes
+ */
+export const categorizeInvestment = (name: string): InvestmentCategory => {
+  const lowerName = name.toLowerCase();
+  
+  if (lowerName.includes('equity') || lowerName.includes('shares') || lowerName.includes('stock')) {
+    return 'equity';
+  }
+  
+  if (lowerName.includes('fd') || lowerName.includes('epf') || lowerName.includes('nps') || 
+      lowerName.includes('fixed') || lowerName.includes('deposit')) {
+    return 'debt';
+  }
+  
+  if (lowerName.includes('gold') || lowerName.includes('real estate') || 
+      lowerName.includes('land') || lowerName.includes('commodity')) {
+    return 'alternative';
+  }
+  
+  // Default to hybrid for mutual funds and other mixed instruments
+  return 'hybrid';
+};
+
+/**
+ * Calculate asset class allocation from investment data
+ */
+export const calculateAssetClassAllocation = (investments: DetailedInvestment[]): AssetClassAllocation => {
+  const totalValue = investments.reduce((sum, inv) => sum + inv.currentValue, 0);
+  
+  if (totalValue === 0) {
+    return { equity: 0, debt: 0, hybrid: 0, alternative: 0 };
+  }
+
+  const allocation = { equity: 0, debt: 0, hybrid: 0, alternative: 0 };
+  
+  investments.forEach(investment => {
+    const category = categorizeInvestment(investment.name);
+    const percentage = (investment.currentValue / totalValue) * 100;
+    allocation[category] += percentage;
+  });
+
+  return allocation;
+};
+
+/**
+ * Calculate comprehensive investment analytics
+ */
+export const calculateInvestmentAnalytics = (data: NetWorthEntry[]): InvestmentAnalytics => {
+  if (!data || data.length === 0) {
     return {
-      bestMonth: { date: '', change: 0 },
-      worstMonth: { date: '', change: 0 }
+      totalInvestmentValue: 0,
+      monthlyInvestmentGrowth: [],
+      bestPerformer: createEmptyVelocity('N/A'),
+      worstPerformer: createEmptyVelocity('N/A'),
+      mostConsistent: createEmptyVelocity('N/A'),
+      highestContributor: createEmptyVelocity('N/A'),
+      portfolioAllocation: { equity: 0, debt: 0, hybrid: 0, alternative: 0 },
+      diversificationScore: 0,
+      overallRiskScore: 0,
+      averageGrowthRate: 0
     };
   }
 
-  const bestMonth = validChanges.reduce((max, curr) => 
-    curr.change > max.change ? curr : max
-  );
-  
-  const worstMonth = validChanges.reduce((min, curr) => 
-    curr.change < min.change ? curr : min
-  );
-  
-  return { bestMonth, worstMonth };
-};
+  // Extract investment data from NetWorthEntry format
+  const investments = extractDetailedInvestments(data);
 
-// Calculate comprehensive performance metrics
-export const calculatePerformanceMetrics = (entries: NetWorthEntry[]): PerformanceMetrics => {
-  if (entries.length < 2) {
-    return {
-      cagr: 0,
-      volatility: 0,
-      maxDrawdown: 0,
-      bestMonth: { date: '', change: 0 },
-      worstMonth: { date: '', change: 0 },
-      averageMonthlyGrowth: 0
-    };
-  }
+  // Calculate velocity for each investment
+  const velocities = investments.map(inv => calculateInvestmentVelocity(inv));
 
-  const netWorthValues = entries.map(entry => entry.netWorth);
-  const monthlyChanges = entries.map(entry => entry.monthOverMonthChange || 0).filter(change => change !== 0);
+  // Find best/worst performers
+  const bestPerformer = velocities.reduce((best, current) => 
+    current.growthRate > best.growthRate ? current : best, velocities[0] || createEmptyVelocity('N/A'));
+
+  const worstPerformer = velocities.reduce((worst, current) => 
+    current.growthRate < worst.growthRate ? current : worst, velocities[0] || createEmptyVelocity('N/A'));
+
+  const mostConsistent = velocities.reduce((consistent, current) => 
+    current.consistencyScore > consistent.consistencyScore ? current : consistent, 
+    velocities[0] || createEmptyVelocity('N/A'));
+
+  const highestContributor = velocities.reduce((contributor, current) => 
+    current.absoluteGrowth > contributor.absoluteGrowth ? current : contributor, 
+    velocities[0] || createEmptyVelocity('N/A'));
+
+  // Calculate portfolio metrics
+  const totalInvestmentValue = investments.reduce((sum, inv) => sum + inv.currentValue, 0);
   
-  const cagr = calculateCAGR(netWorthValues[0], netWorthValues[netWorthValues.length - 1], entries.length - 1);
-  const volatility = calculateVolatility(netWorthValues);
-  const maxDrawdown = calculateMaxDrawdown(netWorthValues);
-  const { bestMonth, worstMonth } = getPerformanceHighlights(entries);
-  const averageMonthlyGrowth = monthlyChanges.length > 0 
-    ? monthlyChanges.reduce((a, b) => a + b, 0) / monthlyChanges.length 
+  const monthlyInvestmentGrowth = data.map(entry => entry.investments.subtotal);
+  
+  const portfolioAllocation = calculateAssetClassAllocation(investments);
+  
+  const diversificationScore = calculateDiversificationScore(investments);
+  
+  const overallRiskScore = calculateOverallRiskScore(velocities);
+  
+  const averageGrowthRate = velocities.length > 0 
+    ? velocities.reduce((sum, vel) => sum + vel.growthRate, 0) / velocities.length 
     : 0;
 
   return {
-    cagr,
-    volatility,
-    maxDrawdown,
-    bestMonth,
-    worstMonth,
-    averageMonthlyGrowth
+    totalInvestmentValue,
+    monthlyInvestmentGrowth,
+    bestPerformer,
+    worstPerformer,
+    mostConsistent,
+    highestContributor,
+    portfolioAllocation,
+    diversificationScore,
+    overallRiskScore,
+    averageGrowthRate
   };
 };
 
-// Format large numbers with appropriate suffixes
-export const formatLargeNumber = (value: number): string => {
-  if (value >= 10000000) { // 1 crore
-    return `₹${(value / 10000000).toFixed(1)}Cr`;
-  } else if (value >= 100000) { // 1 lakh
-    return `₹${(value / 100000).toFixed(1)}L`;
-  } else if (value >= 1000) { // 1 thousand
-    return `₹${(value / 1000).toFixed(0)}K`;
-  }
-  return `₹${value.toFixed(0)}`;
+/**
+ * Extract detailed investments from NetWorthEntry data
+ */
+export const extractDetailedInvestments = (data: NetWorthEntry[]): DetailedInvestment[] => {
+  if (!data || data.length === 0) return [];
+
+  // Get all unique investment names
+  const investmentNames = new Set<string>();
+  data.forEach(entry => {
+    entry.investments.accounts.forEach(account => {
+      investmentNames.add(account.name);
+    });
+  });
+
+  // Create DetailedInvestment objects
+  return Array.from(investmentNames).map(name => {
+    const values: number[] = [];
+    
+    // Extract values for each month for this investment
+    data.forEach(entry => {
+      const account = entry.investments.accounts.find(acc => acc.name === name);
+      if (account && account.values.length > 0) {
+        // Use the latest value for each month
+        values.push(account.values[account.values.length - 1]);
+      } else {
+        values.push(0);
+      }
+    });
+
+    const currentValue = values[values.length - 1] || 0;
+    const initialValue = values.find(v => v > 0) || 0;
+    const growth = initialValue > 0 ? ((currentValue - initialValue) / initialValue) * 100 : 0;
+
+    return {
+      name,
+      values,
+      currentValue,
+      growth,
+      category: categorizeInvestment(name),
+      riskLevel: 'medium' as RiskLevel, // Default, can be enhanced
+      liquidity: 'short-term' as const,  // Default, can be enhanced
+      taxStatus: 'taxable' as const      // Default, can be enhanced
+    };
+  }).filter(inv => inv.currentValue > 0); // Only include investments with current value
 };
 
-// Generate color palette for charts
-export const generateColorPalette = (count: number): string[] => {
-  const baseColors = [
-    '#3B82F6', // Blue
-    '#10B981', // Green
-    '#8B5CF6', // Purple
-    '#EF4444', // Red
-    '#F59E0B', // Yellow
-    '#EC4899', // Pink
-    '#6366F1', // Indigo
-    '#14B8A6', // Teal
-    '#F97316', // Orange
-    '#84CC16'  // Lime
-  ];
+/**
+ * Calculate diversification score (0-100)
+ */
+export const calculateDiversificationScore = (investments: DetailedInvestment[]): number => {
+  if (investments.length === 0) return 0;
 
-  if (count <= baseColors.length) {
-    return baseColors.slice(0, count);
-  }
+  const totalValue = investments.reduce((sum, inv) => sum + inv.currentValue, 0);
+  if (totalValue === 0) return 0;
 
-  // Generate additional colors if needed
-  const colors = [...baseColors];
-  for (let i = baseColors.length; i < count; i++) {
-    const hue = (i * 137.508) % 360; // Golden angle approximation
-    colors.push(`hsl(${hue}, 70%, 50%)`);
-  }
+  // Calculate Herfindahl-Hirschman Index (HHI) for concentration
+  const hhi = investments.reduce((sum, inv) => {
+    const share = (inv.currentValue / totalValue) * 100;
+    return sum + Math.pow(share, 2);
+  }, 0);
 
-  return colors;
+  // Convert HHI to diversification score (lower HHI = higher diversification)
+  // HHI ranges from 0 to 10,000, we convert to 0-100 scale
+  const maxHHI = 10000;
+  const diversificationScore = 100 - (hhi / maxHHI) * 100;
+
+  return Math.max(0, Math.min(100, Math.round(diversificationScore * 10) / 10));
 };
 
-// Risk level classification
-export const classifyRiskLevel = (debtToAssetRatio: number): { 
-  level: 'low' | 'medium' | 'high'; 
-  color: string; 
-  description: string 
-} => {
-  if (debtToAssetRatio < 20) {
-    return {
-      level: 'low',
-      color: '#10B981',
-      description: 'Excellent debt management'
-    };
-  } else if (debtToAssetRatio < 40) {
-    return {
-      level: 'medium', 
-      color: '#F59E0B',
-      description: 'Moderate debt levels'
-    };
-  } else {
-    return {
-      level: 'high',
-      color: '#EF4444',
-      description: 'High debt risk - focus on reduction'
-    };
+/**
+ * Calculate overall portfolio risk score
+ */
+export const calculateOverallRiskScore = (velocities: InvestmentVelocity[]): number => {
+  if (velocities.length === 0) return 0;
+
+  // Weight risk scores: low=1, medium=2, high=3
+  const riskWeights = { low: 1, medium: 2, high: 3 };
+  const totalValue = velocities.reduce((sum, vel) => sum + vel.currentValue, 0);
+  
+  if (totalValue === 0) return 0;
+
+  const weightedRisk = velocities.reduce((sum, vel) => {
+    const weight = vel.currentValue / totalValue;
+    const riskValue = riskWeights[vel.riskScore];
+    return sum + (weight * riskValue);
+  }, 0);
+
+  // Convert to 0-100 scale (3 being max risk)
+  return Math.round((weightedRisk / 3) * 100 * 10) / 10;
+};
+
+/**
+ * Create empty velocity object for fallback
+ */
+export const createEmptyVelocity = (name: string): InvestmentVelocity => ({
+  name,
+  currentValue: 0,
+  growthRate: 0,
+  absoluteGrowth: 0,
+  consistencyScore: 0,
+  riskScore: 'low',
+  trend: 'stable',
+  monthlyReturns: []
+});
+
+/**
+ * Format growth rate for display
+ */
+export const formatGrowthRate = (rate: number): string => {
+  const sign = rate >= 0 ? '+' : '';
+  return `${sign}${rate.toFixed(1)}%`;
+};
+
+/**
+ * Get trend emoji for display
+ */
+export const getTrendEmoji = (trend: InvestmentTrend): string => {
+  switch (trend) {
+    case 'up': return '📈';
+    case 'down': return '📉';
+    case 'stable': return '➡️';
+    default: return '➡️';
   }
 };
 
-// Asset allocation health score
-export const calculateAllocationScore = (allocation: AssetAllocationData[]): {
-  score: number;
-  feedback: string;
-} => {
-  const bankPercentage = allocation.find(a => a.category === 'Bank Accounts')?.percentage || 0;
-  const investmentPercentage = allocation.find(a => a.category === 'Investments')?.percentage || 0;
-  const assetPercentage = allocation.find(a => a.category === 'Other Assets')?.percentage || 0;
-
-  let score = 0;
-  let feedback = '';
-
-  // Ideal allocation rough guidelines (can be customized)
-  if (investmentPercentage >= 30 && investmentPercentage <= 70) score += 40;
-  if (bankPercentage >= 5 && bankPercentage <= 30) score += 30;
-  if (assetPercentage >= 20 && assetPercentage <= 60) score += 30;
-
-  if (score >= 80) {
-    feedback = 'Excellent asset allocation balance';
-  } else if (score >= 60) {
-    feedback = 'Good diversification with room for optimization';
-  } else if (score >= 40) {
-    feedback = 'Consider rebalancing your portfolio';
-  } else {
-    feedback = 'Review allocation strategy for better diversification';
+/**
+ * Get risk color for UI display
+ */
+export const getRiskColor = (riskLevel: RiskLevel): string => {
+  switch (riskLevel) {
+    case 'low': return '#10B981';    // Green
+    case 'medium': return '#F59E0B'; // Amber  
+    case 'high': return '#EF4444';   // Red
+    default: return '#6B7280';       // Gray
   }
-
-  return { score, feedback };
 };

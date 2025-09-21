@@ -17,7 +17,6 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { DebtTrackingChartProps } from '@/lib/types';
-import { extractDebtCategoryData, calculateDebtAnalytics, classifyRiskLevel } from '@/lib/analytics';
 import { formatCurrency, parseChartDate } from '@/lib/utils';
 import { SkeletonChart } from '@/components/common/LoadingSpinner';
 
@@ -72,14 +71,35 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
     );
   }
 
-  const debtData = extractDebtCategoryData(data);
-  const debtAnalytics = calculateDebtAnalytics(data);
-  const riskLevel = classifyRiskLevel(debtAnalytics.debtToAssetRatio);
-  
-  const labels = debtData.dates.map(date => parseChartDate(date));
+  // Extract debt data from entries
+  const labels = data.map(entry => parseChartDate(entry.date));
+  const debtValues = data.map(entry => entry.totalDebt);
+  const debtToAssetRatios = data.map(entry => 
+    entry.totalAssets > 0 ? (entry.totalDebt / entry.totalAssets) * 100 : 0
+  );
 
   // Check if there's any debt data
-  const hasDebtData = debtData.totalDebt.some(value => value > 0);
+  const hasDebtData = debtValues.some(value => value > 0);
+
+  // Simple placeholder calculations for the legacy component
+  const currentDebt = debtValues[debtValues.length - 1] || 0;
+  const initialDebt = debtValues[0] || 0;
+  const monthlyReduction = debtValues.length > 1 ? (initialDebt - currentDebt) / (debtValues.length - 1) : 0;
+  const currentRatio = debtToAssetRatios[debtToAssetRatios.length - 1] || 0;
+  
+  const debtAnalytics = {
+    totalDebt: currentDebt,
+    debtToAssetRatio: currentRatio,
+    monthlyReduction: monthlyReduction,
+    projectedPayoffMonths: monthlyReduction > 0 ? Math.ceil(currentDebt / monthlyReduction) : null
+  };
+
+  const riskLevel = {
+    level: currentRatio > 50 ? 'high' : currentRatio > 30 ? 'medium' : 'low',
+    color: currentRatio > 50 ? '#EF4444' : currentRatio > 30 ? '#F59E0B' : '#10B981',
+    description: currentRatio > 50 ? 'High debt ratio requires attention' : 
+                currentRatio > 30 ? 'Moderate debt ratio - manageable' : 'Low debt ratio - healthy'
+  };
 
   if (!hasDebtData) {
     return (
@@ -117,7 +137,7 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
     datasets: [
       {
         label: 'Total Debt',
-        data: debtData.totalDebt,
+        data: debtValues,
         borderColor: 'rgb(239, 68, 68)',
         backgroundColor: 'rgba(239, 68, 68, 0.1)',
         borderWidth: 3,
@@ -132,7 +152,7 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
       },
       {
         label: 'Debt-to-Asset Ratio',
-        data: debtData.debtToAssetRatio,
+        data: debtToAssetRatios,
         borderColor: 'rgb(245, 158, 11)',
         backgroundColor: 'rgba(245, 158, 11, 0.1)',
         borderWidth: 3,

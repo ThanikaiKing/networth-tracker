@@ -17,7 +17,6 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { AssetGrowthChartProps } from '@/lib/types';
-import { extractAssetCategoryData } from '@/lib/analytics';
 import { formatCurrency, parseChartDate } from '@/lib/utils';
 import { SkeletonChart } from '@/components/common/LoadingSpinner';
 
@@ -72,14 +71,15 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
     );
   }
 
-  const categoryData = extractAssetCategoryData(data);
-  const labels = categoryData.dates.map(date => parseChartDate(date));
+  // Extract data for asset growth chart
+  const labels = data.map(entry => parseChartDate(entry.date));
+  const bankAccountsData = data.map(entry => entry.bankAccounts.subtotal);
+  const investmentsData = data.map(entry => entry.investments.subtotal);
+  const otherAssetsData = data.map(entry => entry.otherAssets.subtotal);
 
   // Calculate total assets for tooltips
   const getTotalAtIndex = (index: number): number => {
-    return categoryData.bankAccounts[index] + 
-           categoryData.investments[index] + 
-           categoryData.otherAssets[index];
+    return bankAccountsData[index] + investmentsData[index] + otherAssetsData[index];
   };
 
   // Chart configuration
@@ -88,7 +88,7 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
     datasets: [
       {
         label: 'Bank Accounts',
-        data: categoryData.bankAccounts,
+        data: bankAccountsData,
         backgroundColor: 'rgba(59, 130, 246, 0.3)',
         borderColor: 'rgb(59, 130, 246)',
         borderWidth: 2,
@@ -102,7 +102,7 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
       },
       {
         label: 'Investments',
-        data: categoryData.investments,
+        data: investmentsData,
         backgroundColor: 'rgba(16, 185, 129, 0.3)',
         borderColor: 'rgb(16, 185, 129)',
         borderWidth: 2,
@@ -116,7 +116,7 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
       },
       {
         label: 'Other Assets',
-        data: categoryData.otherAssets,
+        data: otherAssetsData,
         backgroundColor: 'rgba(139, 92, 246, 0.3)',
         borderColor: 'rgb(139, 92, 246)',
         borderWidth: 2,
@@ -251,14 +251,14 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
   };
 
   // Calculate growth statistics
-  const bankGrowth = categoryData.bankAccounts.length > 1 
-    ? categoryData.bankAccounts[categoryData.bankAccounts.length - 1] - categoryData.bankAccounts[0]
+  const bankGrowth = bankAccountsData.length > 1 
+    ? bankAccountsData[bankAccountsData.length - 1] - bankAccountsData[0]
     : 0;
-  const investmentGrowth = categoryData.investments.length > 1
-    ? categoryData.investments[categoryData.investments.length - 1] - categoryData.investments[0]
+  const investmentGrowth = investmentsData.length > 1 
+    ? investmentsData[investmentsData.length - 1] - investmentsData[0]
     : 0;
-  const assetGrowth = categoryData.otherAssets.length > 1
-    ? categoryData.otherAssets[categoryData.otherAssets.length - 1] - categoryData.otherAssets[0]
+  const assetGrowth = otherAssetsData.length > 1 
+    ? otherAssetsData[otherAssetsData.length - 1] - otherAssetsData[0]
     : 0;
 
   const totalGrowth = bankGrowth + investmentGrowth + assetGrowth;
@@ -300,7 +300,7 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
               {bankGrowth >= 0 ? '+' : ''}{formatCurrency(bankGrowth)}
             </div>
             <div className="text-xs text-blue-600">
-              Current: {formatCurrency(categoryData.bankAccounts[categoryData.bankAccounts.length - 1] || 0)}
+              Current: {formatCurrency(bankAccountsData[bankAccountsData.length - 1] || 0)}
             </div>
           </div>
         </div>
@@ -315,7 +315,7 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
               {investmentGrowth >= 0 ? '+' : ''}{formatCurrency(investmentGrowth)}
             </div>
             <div className="text-xs text-green-600">
-              Current: {formatCurrency(categoryData.investments[categoryData.investments.length - 1] || 0)}
+              Current: {formatCurrency(investmentsData[investmentsData.length - 1] || 0)}
             </div>
           </div>
         </div>
@@ -330,7 +330,7 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
               {assetGrowth >= 0 ? '+' : ''}{formatCurrency(assetGrowth)}
             </div>
             <div className="text-xs text-purple-600">
-              Current: {formatCurrency(categoryData.otherAssets[categoryData.otherAssets.length - 1] || 0)}
+              Current: {formatCurrency(otherAssetsData[otherAssetsData.length - 1] || 0)}
             </div>
           </div>
         </div>

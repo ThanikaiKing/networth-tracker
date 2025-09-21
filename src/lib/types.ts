@@ -166,6 +166,13 @@ export interface DetailedInvestment {
   values: number[];
   currentValue: number;
   growth: number;
+  category: InvestmentCategory;
+  riskLevel: RiskLevel;
+  liquidity: LiquidityLevel;
+  taxStatus: TaxStatus;
+  maturityDate?: string;
+  sipAmount?: number;
+  expenseRatio?: number;
 }
 
 export interface DetailedAsset {
@@ -180,4 +187,89 @@ export interface DetailedDebt {
   values: number[];
   currentValue: number;
   reduction: number;
+}
+
+// Investment-specific types and interfaces
+export type InvestmentCategory = 'equity' | 'debt' | 'hybrid' | 'alternative';
+export type RiskLevel = 'low' | 'medium' | 'high';
+export type LiquidityLevel = 'immediate' | 'short-term' | 'long-term';
+export type TaxStatus = 'taxable' | 'tax-free' | 'tax-deferred';
+export type InvestmentTrend = 'up' | 'down' | 'stable';
+
+// Investment velocity analysis
+export interface InvestmentVelocity {
+  name: string;
+  currentValue: number;
+  growthRate: number; // Percentage
+  absoluteGrowth: number; // Rupees
+  consistencyScore: number; // 0-100 scale
+  riskScore: RiskLevel;
+  trend: InvestmentTrend;
+  monthlyReturns: number[];
+}
+
+// Asset class allocation breakdown
+export interface AssetClassAllocation {
+  equity: number;
+  debt: number;
+  hybrid: number;
+  alternative: number;
+}
+
+// Investment analytics data
+export interface InvestmentAnalytics {
+  totalInvestmentValue: number;
+  monthlyInvestmentGrowth: number[];
+  bestPerformer: InvestmentVelocity;
+  worstPerformer: InvestmentVelocity;
+  mostConsistent: InvestmentVelocity;
+  highestContributor: InvestmentVelocity;
+  portfolioAllocation: AssetClassAllocation;
+  diversificationScore: number;
+  overallRiskScore: number;
+  averageGrowthRate: number;
+}
+
+// Investment chart component props
+export interface InvestmentGrowthChartProps {
+  data: NetWorthEntry[];
+  selectedPeriod: TimePeriod;
+  selectedInvestments?: string[]; // Allow filtering specific investments
+  isLoading: boolean;
+}
+
+export interface InvestmentAllocationChartProps {
+  data: NetWorthEntry[];
+  isLoading: boolean;
+}
+
+export interface InvestmentVelocityCardProps {
+  velocity: InvestmentVelocity;
+  rank: number;
+  isLoading: boolean;
+}
+
+export interface InvestmentPerformanceCardsProps {
+  analytics: InvestmentAnalytics;
+  isLoading: boolean;
+}
+
+export interface InvestmentDashboardProps {
+  data: NetWorthEntry[];
+  selectedPeriod: TimePeriod;
+  onPeriodChange: (period: TimePeriod) => void;
+  isLoading: boolean;
+}
+
+// Investment colors configuration
+export interface InvestmentColorConfig {
+  [key: string]: string;
+}
+
+// Enhanced investment data for charts
+export interface InvestmentChartData {
+  name: string;
+  data: ChartDataPoint[];
+  color: string;
+  category: InvestmentCategory;
 }
