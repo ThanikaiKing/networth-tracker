@@ -2,7 +2,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -14,13 +14,13 @@ import {
 import { Doughnut } from 'react-chartjs-2';
 import { AssetAllocationChartProps } from '@/lib/types';
 import { calculateAssetAllocation } from '@/lib/utils';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatCurrencyShort } from '@/lib/utils';
 import { SkeletonChart } from '@/components/common/LoadingSpinner';
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-// Custom plugin to display center text
+// Custom plugin to display center text with responsive font sizing
 const createCenterTextPlugin = (totalAssets: number): Plugin<'doughnut'> => ({
   id: 'centerText',
   beforeDraw: (chart) => {
@@ -36,22 +36,35 @@ const createCenterTextPlugin = (totalAssets: number): Plugin<'doughnut'> => ({
     const centerX = (chartArea.left + chartArea.right) / 2;
     const centerY = (chartArea.top + chartArea.bottom) / 2;
     
+    // Calculate responsive font sizes based on chart dimensions
+    const chartWidth = chartArea.right - chartArea.left;
+    const chartHeight = chartArea.bottom - chartArea.top;
+    const baseSize = Math.min(chartWidth, chartHeight);
+    
+    // Responsive font sizes with minimum and maximum bounds
+    const labelFontSize = Math.max(10, Math.min(16, baseSize * 0.04));
+    const valueFontSize = Math.max(12, Math.min(20, baseSize * 0.05));
+    
     // Set text properties
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#374151'; // gray-700
     
-    // Draw "Total Assets" label
-    ctx.font = 'bold 16px sans-serif';
-    ctx.fillText('Total Assets', centerX, centerY - 12);
+    // Draw "Total Assets" label with responsive font size
+    ctx.font = `bold ${labelFontSize}px sans-serif`;
+    ctx.fillText('Total Assets', centerX, centerY - (labelFontSize * 0.75));
     
-    // Draw the amount
-    ctx.font = 'bold 20px sans-serif';
-    ctx.fillText(new Intl.NumberFormat('en-IN', {
+    // Draw the amount with responsive font size
+    ctx.font = `bold ${valueFontSize}px sans-serif`;
+    const formattedAmount = new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0,
-    }).format(totalAssets), centerX, centerY + 12);
+    }).format(totalAssets);
+    
+    // For very small screens, use short format to prevent overflow
+    const displayAmount = baseSize < 200 ? formatCurrencyShort(totalAssets) : formattedAmount;
+    ctx.fillText(displayAmount, centerX, centerY + (valueFontSize * 0.5));
     
     // Restore the context state
     ctx.restore();
@@ -62,6 +75,25 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
   data,
   isLoading,
 }) => {
+  // State for responsive legend management
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Effect to handle window resize and detect mobile screens
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+
+    // Check initial screen size
+    checkScreenSize();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', checkScreenSize);
+
+    // Cleanup event listener
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   if (isLoading) {
     return <SkeletonChart className="h-96" />;
   }
@@ -114,24 +146,24 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
     );
   }
 
-  // Convert AssetAllocation object to array for chart
+  // Convert AssetAllocation object to array for chart - Fix: use actual amounts for values, percentages for percentages
   const assetCategories = [
     { 
       category: 'Bank Accounts', 
-      value: allocationData.bankAccounts, 
-      percentage: allocationData.bankAccounts,
+      value: latestEntry.bankAccounts.subtotal, // Actual amount in rupees
+      percentage: allocationData.bankAccounts, // Percentage
       color: '#3B82F6' 
     },
     { 
       category: 'Investments', 
-      value: allocationData.investments, 
-      percentage: allocationData.investments,
+      value: latestEntry.investments.subtotal, // Actual amount in rupees
+      percentage: allocationData.investments, // Percentage
       color: '#10B981' 
     },
     { 
       category: 'Other Assets', 
-      value: allocationData.otherAssets, 
-      percentage: allocationData.otherAssets,
+      value: latestEntry.otherAssets.subtotal, // Actual amount in rupees
+      percentage: allocationData.otherAssets, // Percentage
       color: '#F59E0B' 
     },
   ].filter(item => item.value > 0);
@@ -155,6 +187,7 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
     maintainAspectRatio: false,
     plugins: {
       legend: {
+        display: !isMobile, // Hide legend on mobile screens
         position: 'right' as const,
         labels: {
           usePointStyle: true,
@@ -168,7 +201,7 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
             if (data.labels?.length && data.datasets.length) {
               return (data.labels as string[]).map((label: string, i: number) => {
                 const value = (data.datasets[0].data[i] as number) || 0;
-                const percentage = assetCategories[i]?.value || 0;
+                const percentage = assetCategories[i]?.percentage || 0; // Fix: use percentage field, not value
                 return {
                   text: `${label}\n${formatCurrency(value)} (${percentage.toFixed(1)}%)`,
                   fillStyle: (data.datasets[0].backgroundColor as string[])?.[i] || '#000000',
@@ -246,8 +279,8 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
         />
       </div>
 
-      {/* Allocation Details */}
-      <div className="space-y-3">
+      {/* Allocation Details - Desktop Version */}
+      <div className="space-y-3 hidden lg:block">
         <div className="text-sm font-medium text-gray-700">Allocation Details:</div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {assetCategories.map((item, index) => (
@@ -266,6 +299,34 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
               </div>
               <div className="text-sm font-semibold text-gray-900">
                 {item.percentage.toFixed(1)}%
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Allocation Details - Mobile Version */}
+      <div className="space-y-3 lg:hidden">
+        <div className="text-sm font-medium text-gray-700">Allocation Breakdown:</div>
+        <div className="space-y-2">
+          {assetCategories.map((item, index) => (
+            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <div 
+                  className="w-3 h-3 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="text-sm font-medium text-gray-900">
+                  {item.category}
+                </span>
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-semibold text-gray-900">
+                  {item.percentage.toFixed(1)}%
+                </div>
+                <div className="text-xs text-gray-500">
+                  {formatCurrencyShort(item.value)}
+                </div>
               </div>
             </div>
           ))}
