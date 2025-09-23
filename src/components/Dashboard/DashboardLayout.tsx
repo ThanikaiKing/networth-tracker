@@ -16,22 +16,56 @@ import { AssetGrowthChart } from '@/components/Charts/AssetGrowthChart';
 import { DebtTrackingChart } from '@/components/Charts/DebtTrackingChart';
 import { DebtCompositionChart } from '@/components/Charts/DebtCompositionChart';
 import { InvestmentDashboard } from './InvestmentDashboard';
+import LiquidEther from '@/components/LiquidEther';
 
 const AVAILABLE_PERIODS: TimePeriod[] = ['all', '6months', '3months', '1month'];
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('all');
+  const [backgroundEnabled, setBackgroundEnabled] = useState<boolean>(true);
   const { data, loading, error, refetch } = useNetWorthData(selectedPeriod);
 
   const handlePeriodChange = (period: TimePeriod) => {
     setSelectedPeriod(period);
   };
 
+  const toggleBackground = () => {
+    setBackgroundEnabled(!backgroundEnabled);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className={`min-h-screen relative ${!backgroundEnabled ? 'bg-gray-50' : ''}`}>
+      {/* LiquidEther Background */}
+      {backgroundEnabled && (
+        <div 
+          className="fixed inset-0 w-full h-full"
+          style={{ zIndex: -1 }}
+        >
+          <LiquidEther
+            colors={['#5227FF', '#FF9FFC', '#B19EEF']}
+            mouseForce={20}
+            cursorSize={100}
+            isViscous={false}
+            viscous={30}
+            iterationsViscous={32}
+            iterationsPoisson={32}
+            resolution={0.5}
+            isBounce={false}
+            autoDemo={true}
+            autoSpeed={0.5}
+            autoIntensity={2.2}
+            takeoverDuration={0.25}
+            autoResumeDelay={3000}
+            autoRampDuration={0.6}
+          />
+        </div>
+      )}
+
+      {/* Content Overlay */}
+      <div className="relative z-10">
+        <Header backgroundEnabled={backgroundEnabled} />
+        
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-20">
         {error ? (
           <ErrorDisplay 
             error={error}
@@ -41,7 +75,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
         ) : (
           <>
             {/* Dashboard Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+            <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 rounded-lg p-6 shadow-sm border ${
+              backgroundEnabled 
+                ? 'bg-white/90 backdrop-blur-sm border-white/20' 
+                : 'bg-white border-gray-200'
+            }`}>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
                   Financial Overview
@@ -135,7 +173,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
 
             {/* Data Status Footer */}
             {data && !loading && (
-              <div className="mt-8 p-4 bg-white rounded-lg border border-gray-200">
+              <div className={`mt-8 p-4 rounded-lg shadow-sm border ${
+                backgroundEnabled 
+                  ? 'bg-white/90 backdrop-blur-sm border-white/20' 
+                  : 'bg-white border-gray-200'
+              }`}>
                 <div className="flex items-center justify-between text-sm text-gray-600">
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
@@ -171,7 +213,50 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
             )}
           </>
         )}
-      </main>
+        </main>
+      </div>
+
+      {/* Dev Toggle Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={toggleBackground}
+          className={`
+            flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium 
+            transition-all duration-200 shadow-lg hover:shadow-xl
+            ${backgroundEnabled 
+              ? 'bg-purple-600 hover:bg-purple-700 text-white' 
+              : 'bg-gray-600 hover:bg-gray-700 text-white'
+            }
+          `}
+          title="Toggle liquid background effect"
+        >
+          <svg 
+            className="w-4 h-4" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            {backgroundEnabled ? (
+              // Eye open icon
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" 
+              />
+            ) : (
+              // Eye closed icon
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" 
+              />
+            )}
+          </svg>
+          {backgroundEnabled ? 'Liquid ON' : 'Liquid OFF'}
+        </button>
+      </div>
     </div>
   );
 };
