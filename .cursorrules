@@ -23,6 +23,13 @@
 3. Only proceed with git add/commit/push after successful build
 4. Never commit code that doesn't pass build validation
 
+## Build Validation Rule
+**MANDATORY**: Always ensure successful build after every prompt or when all todos are complete:
+1. Run `npm run build` to validate TypeScript compilation and linting
+2. Run `npm run dev` to ensure development server starts without errors
+3. Fix any compilation errors, type errors, or linting issues before marking tasks complete
+4. Never leave the codebase in a broken state
+
 ## Type Safety Checklist
 - Replace all `any` types with specific interfaces
 - Add null checks for potentially undefined chart data

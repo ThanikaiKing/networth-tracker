@@ -1,6 +1,7 @@
 // Header component for the dashboard
 
 import React from 'react';
+import ShinyText from '../ShinyText';
 
 export const Header: React.FC = () => {
   return (
@@ -9,17 +10,13 @@ export const Header: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo/Title */}
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Net Worth Dashboard
+            <h1 className="text-2xl font-bold">
+              <ShinyText 
+                text="Net Worth Dashboard"
+                speed={3}
+                className=""
+              />
             </h1>
-          </div>
-
-          {/* Status indicator */}
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-600">Live Data</span>
-            </div>
           </div>
         </div>
       </div>
