@@ -8,7 +8,11 @@ import {
   InvestmentAccount,
   BankAccount,
   Asset,
-  Debt
+  Debt,
+  GrowthAnalysis,
+  ProjectionScenario,
+  ProjectionParameters,
+  ProjectionDataPoint
 } from './types';
 
 // Row mapping constants for your specific sheet
@@ -449,5 +453,183 @@ export const validateNetWorthData = (data: NetWorthEntry[]): boolean => {
     entry.netWorth > 0 &&
     entry.date && entry.date.length > 0
   );
+};
+
+// PROJECTION UTILITIES
+
+/**
+ * Analyzes historical growth patterns to inform projections
+ */
+// Base monthly savings (current year) - no UI input; configurable via env with fallback
+export const getBaseMonthlySavingsINR = (): number => {
+  const envValue = process.env.NEXT_PUBLIC_BASE_MONTHLY_SAVINGS;
+  const parsed = envValue ? parseFloat(envValue) : NaN;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 150000; // default ₹1.5L
+};
+
+// Estimate monthly savings for a given historical index, assuming +10% per year
+// i: index in data (0..N-1); N-1 is latest
+export const estimateHistoricalMonthlySavings = (dataLength: number, i: number): number => {
+  const monthsFromEnd = (dataLength - 1) - i;
+  const yearsBack = Math.floor(monthsFromEnd / 12);
+  const base = getBaseMonthlySavingsINR();
+  return base / Math.pow(1.1, yearsBack);
+};
+
+export const analyzeHistoricalGrowth = (data: NetWorthEntry[]): GrowthAnalysis => {
+  if (!data.length) {
+    return {
+      averageMonthlyGrowthRate: 0,
+      medianMonthlyGrowthRate: 0,
+      standardDeviation: 0,
+      consistencyScore: 0,
+      volatilityIndex: 0,
+      trendDirection: 'neutral'
+    };
+  }
+
+  // Calculate month-over-month percentage returns excluding contributions
+  const growthRates: number[] = [];
+  for (let i = 1; i < data.length; i++) {
+    const prevNW = data[i - 1].netWorth;
+    const currNW = data[i].netWorth;
+    if (!prevNW || prevNW <= 0) continue;
+    const assumedSaving = estimateHistoricalMonthlySavings(data.length, i);
+    const monthlyReturnDecimal = (currNW - prevNW - assumedSaving) / prevNW; // decimal
+    growthRates.push(monthlyReturnDecimal * 100); // store as percent
+  }
+
+  if (!growthRates.length) {
+    return {
+      averageMonthlyGrowthRate: 0,
+      medianMonthlyGrowthRate: 0,
+      standardDeviation: 0,
+      consistencyScore: 0,
+      volatilityIndex: 0,
+      trendDirection: 'neutral'
+    };
+  }
+
+  // Calculate mean
+  const sum = growthRates.reduce((acc, rate) => acc + rate, 0);
+  const average = sum / growthRates.length; // percent
+
+  // Calculate median
+  const sorted = [...growthRates].sort((a, b) => a - b);
+  const median = sorted.length % 2 === 0
+    ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+    : sorted[Math.floor(sorted.length / 2)];
+
+  // Calculate standard deviation
+  const squaredDifferences = growthRates.map(rate => Math.pow(rate - average, 2));
+  const variance = squaredDifferences.reduce((acc, sq) => acc + sq, 0) / growthRates.length;
+  const stdDev = Math.sqrt(variance);
+
+  // Calculate consistency score (inverse of coefficient of variation)
+  const coefficientOfVariation = Math.abs(stdDev / (average || 1));
+  const consistencyScore = Math.max(0, Math.min(100, 100 - (coefficientOfVariation * 20)));
+
+  // Calculate volatility index
+  const volatilityIndex = Math.min(100, coefficientOfVariation * 20);
+
+  // Determine trend direction
+  const trendDirection: 'positive' | 'negative' | 'neutral' = 
+    average > 0 ? 'positive' : average < 0 ? 'negative' : 'neutral';
+
+  return {
+    averageMonthlyGrowthRate: average, // percent
+    medianMonthlyGrowthRate: median,   // percent
+    standardDeviation: stdDev,         // percent std dev
+    consistencyScore,
+    volatilityIndex,
+    trendDirection
+  };
+};
+
+/**
+ * Generates projection scenarios based on historical analysis and parameters
+ */
+export const generateProjectionScenarios = (
+  historicalData: NetWorthEntry[],
+  projectionYears: number,
+  growthAnalysis: GrowthAnalysis,
+  parameters: ProjectionParameters
+): ProjectionScenario[] => {
+  const currentNetWorth = historicalData[historicalData.length - 1]?.netWorth || 0;
+  const baseGrowthRatePercent = growthAnalysis.averageMonthlyGrowthRate; // percent per month
+
+  // Define scenario multipliers based on historical performance
+  const scenarios: Array<{
+    name: 'conservative' | 'moderate' | 'aggressive';
+    growthMultiplier: number;
+    confidenceLevel: number;
+  }> = [
+    {
+      name: 'conservative',
+      growthMultiplier: 0.7, // 70% of historical average
+      confidenceLevel: 85
+    },
+    {
+      name: 'moderate',
+      growthMultiplier: 1.0, // Historical average
+      confidenceLevel: 70
+    },
+    {
+      name: 'aggressive',
+      growthMultiplier: 1.3, // 130% of historical average
+      confidenceLevel: 50
+    }
+  ];
+
+  return scenarios.map(scenario => {
+    const adjustedGrowthRatePercent = baseGrowthRatePercent * scenario.growthMultiplier; // percent
+    const monthlyInflationRate = parameters.annualInflationRate / 100 / 12; // decimal
+    const monthlyReturnDecimal = (adjustedGrowthRatePercent / 100) - monthlyInflationRate; // real return decimal
+    const projectionData: ProjectionDataPoint[] = [];
+    
+    // Generate monthly projections
+    let currentValue = currentNetWorth;
+    const lastHistoricalDate = new Date(historicalData[historicalData.length - 1]?.date || '');
+    
+    for (let month = 1; month <= projectionYears * 12; month++) {
+      const projectionDate = new Date(lastHistoricalDate);
+      projectionDate.setMonth(projectionDate.getMonth() + month);
+      
+      // Apply compound growth (real growth rate)
+      currentValue = currentValue * (1 + monthlyReturnDecimal);
+      
+      // Add monthly savings with 10% annual step-up (nominal schedule, no inflation compounding here)
+      const base = getBaseMonthlySavingsINR();
+      const yearsForward = Math.floor((month - 1) / 12);
+      const steppedSavings = base * Math.pow(1.1, yearsForward);
+      currentValue += steppedSavings;
+      
+      projectionData.push({
+        x: projectionDate.toISOString().substring(0, 7), // YYYY-MM format
+        y: Math.round(currentValue),
+        isProjected: true
+      });
+    }
+
+    return {
+      name: scenario.name,
+      monthlyGrowthRate: monthlyReturnDecimal * 100, // percent
+      data: projectionData,
+      confidenceLevel: scenario.confidenceLevel
+    };
+  });
+};
+
+/**
+ * Validates projection data for minimum requirements
+ */
+export const validateProjectionData = (data: NetWorthEntry[]): string | null => {
+  if (!data.length) return "No historical data available for projections";
+  if (data.length < 3) return "Minimum 3 months of data required for reliable projections";
+  
+  const hasValidGrowth = data.some(entry => entry.monthOverMonthChange && entry.monthOverMonthChange !== 0);
+  if (!hasValidGrowth) return "No growth data found in historical records";
+  
+  return null;
 };
 

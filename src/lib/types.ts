@@ -273,3 +273,75 @@ export interface InvestmentChartData {
   color: string;
   category: InvestmentCategory;
 }
+
+// Projection feature types
+export interface ProjectionDataPoint {
+  x: string; // date (YYYY-MM format)
+  y: number; // projected net worth value
+  isProjected: boolean; // distinguish from historical data
+}
+
+export interface ProjectionParameters {
+  annualInflationRate: number; // Expected inflation rate (%)
+}
+
+export interface GrowthAnalysis {
+  averageMonthlyGrowthRate: number;
+  medianMonthlyGrowthRate: number;
+  standardDeviation: number;
+  consistencyScore: number; // 0-100, higher = more consistent
+  volatilityIndex: number; // 0-100, higher = more volatile
+  trendDirection: 'positive' | 'negative' | 'neutral';
+}
+
+export interface ProjectionScenario {
+  name: 'conservative' | 'moderate' | 'aggressive';
+  monthlyGrowthRate: number; // calculated from historical data
+  data: ProjectionDataPoint[];
+  confidenceLevel: number; // 0-100 representing confidence in projection
+}
+
+export interface ProjectionResult {
+  projectionPeriodYears: number;
+  historicalData: NetWorthEntry[];
+  scenarios: ProjectionScenario[];
+  summary: {
+    currentNetWorth: number;
+    projectedNetWorth: number; // for moderate scenario
+    totalGrowthProjected: number;
+    averageMonthlyGrowth: number;
+    totalContributions: number; // Sum of monthly contributions over projection period
+  };
+  growthAnalysis: GrowthAnalysis;
+  parameters: ProjectionParameters;
+}
+
+// Component props for projection feature
+export interface ProjectionSectionProps {
+  data: NetWorthEntry[];
+  isLoading: boolean;
+}
+
+export interface ProjectionChartProps {
+  data: NetWorthEntry[];
+  projectionResult: ProjectionResult | null;
+  selectedScenario: 'conservative' | 'moderate' | 'aggressive';
+  isLoading: boolean;
+}
+
+export interface ProjectionControlsProps {
+  projectionYears: number;
+  onProjectionChange: (years: number) => void;
+  selectedScenario: 'conservative' | 'moderate' | 'aggressive';
+  onScenarioChange: (scenario: 'conservative' | 'moderate' | 'aggressive') => void;
+  parameters: ProjectionParameters;
+  onParametersChange: (params: ProjectionParameters) => void;
+  minYears?: number;
+  maxYears?: number;
+}
+
+export interface ProjectionSummaryCardsProps {
+  projectionResult: ProjectionResult | null;
+  selectedScenario: 'conservative' | 'moderate' | 'aggressive';
+  isLoading: boolean;
+}

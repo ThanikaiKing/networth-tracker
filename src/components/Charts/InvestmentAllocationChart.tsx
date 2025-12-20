@@ -189,9 +189,9 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
         labels: {
           usePointStyle: true,
           pointStyle: 'circle',
-          font: { 
-            size: 11, 
-            weight: 500 
+          font: {
+            size: 11,
+            weight: 500
           },
           color: 'rgb(107, 114, 128)',
           padding: 15,
@@ -272,14 +272,14 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
         <div className="relative h-80">
           <Doughnut data={chartData} options={chartOptions} />
           {/* Center label with total value */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {/* <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-center">
               <div className="text-xs text-gray-500">Total</div>
               <div className="text-lg font-bold text-gray-900">
                 {formatCurrencyShort(totalInvestments)}
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Investment Breakdown List */}
@@ -289,7 +289,7 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
             {investmentBreakdown.map((investment, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 <div className="flex items-center space-x-3">
-                  <div 
+                  <div
                     className="w-4 h-4 rounded flex-shrink-0"
                     style={{ backgroundColor: investment.color }}
                   />

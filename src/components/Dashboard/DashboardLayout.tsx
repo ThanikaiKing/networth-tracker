@@ -16,6 +16,7 @@ import { AssetGrowthChart } from '@/components/Charts/AssetGrowthChart';
 import { DebtTrackingChart } from '@/components/Charts/DebtTrackingChart';
 import { DebtCompositionChart } from '@/components/Charts/DebtCompositionChart';
 import { InvestmentDashboard } from './InvestmentDashboard';
+import { ProjectionSection } from './ProjectionSection';
 
 const AVAILABLE_PERIODS: TimePeriod[] = ['all', '6months', '3months', '1month'];
 
@@ -125,6 +126,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
                 />
               </ChartGrid>
             </ChartSection>
+
+            {/* Net Worth Projection Section */}
+            <ProjectionSection
+              data={data?.entries || []}
+              isLoading={loading}
+            />
 
             {/* Additional content area */}
             {children && (
