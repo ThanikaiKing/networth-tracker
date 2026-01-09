@@ -332,8 +332,6 @@ export interface ProjectionChartProps {
 export interface ProjectionControlsProps {
   projectionYears: number;
   onProjectionChange: (years: number) => void;
-  selectedScenario: 'conservative' | 'moderate' | 'aggressive';
-  onScenarioChange: (scenario: 'conservative' | 'moderate' | 'aggressive') => void;
   parameters: ProjectionParameters;
   onParametersChange: (params: ProjectionParameters) => void;
   minYears?: number;

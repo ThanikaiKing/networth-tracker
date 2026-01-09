@@ -23,17 +23,17 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
   );
 
   return (
-    <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+    <div className="flex items-center space-x-1 glass rounded-xl p-1">
       {filteredOptions.map((option) => (
         <button
           key={option.value}
           onClick={() => onPeriodChange(option.value)}
           className={cn(
-            'px-3 py-2 text-sm font-medium rounded-md transition-all duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100',
+            'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
             selectedPeriod === option.value
-              ? 'bg-white text-blue-600 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              ? 'bg-primary/20 text-primary shadow-lg shadow-primary/10 border border-primary/20'
+              : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
           )}
         >
           {option.label}
@@ -53,23 +53,26 @@ export const PeriodSelectorDropdown: React.FC<PeriodSelectorProps> = ({
     availablePeriods.includes(option.value)
   );
 
-
   return (
     <div className="relative">
       <select
         value={selectedPeriod}
         onChange={(e) => onPeriodChange(e.target.value as TimePeriod)}
-        className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="appearance-none glass rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
       >
         {filteredOptions.map((option) => (
-          <option key={option.value} value={option.value}>
+          <option 
+            key={option.value} 
+            value={option.value}
+            className="bg-background text-foreground"
+          >
             {option.label}
           </option>
         ))}
       </select>
-      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+      <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
         <svg
-          className="w-4 h-4 text-gray-400"
+          className="w-4 h-4 text-muted-foreground"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

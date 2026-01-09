@@ -28,15 +28,15 @@ ChartJS.register(
   Legend
 );
 
-// Helper functions for debt categorization
+// Helper functions for debt categorization - updated for dark theme
 const getDebtColor = (debtName: string): string => {
   const name = debtName.toLowerCase();
-  if (name.includes('home') || name.includes('mortgage')) return '#EF4444';
-  if (name.includes('personal') || name.includes('consumer')) return '#F97316';
-  if (name.includes('credit') || name.includes('card')) return '#DC2626';
-  if (name.includes('student') || name.includes('education')) return '#F59E0B';
-  if (name.includes('car') || name.includes('vehicle') || name.includes('auto')) return '#EA580C';
-  return '#6B7280'; // Default gray for unknown debt types
+  if (name.includes('home') || name.includes('mortgage')) return 'oklch(0.65 0.22 25)';
+  if (name.includes('personal') || name.includes('consumer')) return 'oklch(0.7 0.2 35)';
+  if (name.includes('credit') || name.includes('card')) return 'oklch(0.6 0.25 20)';
+  if (name.includes('student') || name.includes('education')) return 'oklch(0.75 0.18 85)';
+  if (name.includes('car') || name.includes('vehicle') || name.includes('auto')) return 'oklch(0.68 0.2 30)';
+  return 'oklch(0.5 0.02 260)';
 };
 
 const getDebtDescription = (debtName: string): string => {
@@ -59,12 +59,12 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-96">
+      <div className="glass-card rounded-2xl p-6 h-96">
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-2xl glass mb-4">
               <svg
-                className="h-6 w-6 text-gray-400"
+                className="h-8 w-8 text-muted-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -72,13 +72,13 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                 />
               </svg>
             </div>
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No Debt Data</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-sm font-medium text-foreground mb-1">No Debt Data</h3>
+            <p className="text-sm text-muted-foreground">
               Debt composition data is not available.
             </p>
           </div>
@@ -92,10 +92,9 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
   const totalDebt = latestEntry.totalDebt;
 
   // Extract individual debt categories from the latest data entry
-  // Based on the CSV structure: Home loan (row 55) and Personal loan (row 56)
   const debtCategories = latestEntry.debt.debts
     .map(debt => {
-      const currentValue = debt.values[debt.values.length - 1]; // Latest value only
+      const currentValue = debt.values[debt.values.length - 1];
       return {
         name: debt.name,
         value: currentValue,
@@ -110,14 +109,14 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
     debtCategories.push(
       {
         name: 'Home Loan',
-        value: totalDebt * 0.85, // Based on CSV analysis
-        color: '#EF4444',
+        value: totalDebt * 0.85,
+        color: 'oklch(0.65 0.22 25)',
         description: 'Primary residence mortgage'
       },
       {
         name: 'Personal Loan', 
-        value: totalDebt * 0.15, // Based on CSV analysis
-        color: '#F97316',
+        value: totalDebt * 0.15,
+        color: 'oklch(0.7 0.2 35)',
         description: 'Personal/consumer loans'
       }
     );
@@ -126,12 +125,12 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
   // If no debt, show debt-free message
   if (totalDebt === 0 || debtCategories.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-96">
+      <div className="glass-card rounded-2xl p-6 h-96">
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-2xl bg-primary/10 mb-4">
               <svg
-                className="h-6 w-6 text-green-500"
+                className="h-8 w-8 text-primary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -144,8 +143,8 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
                 />
               </svg>
             </div>
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No Outstanding Debt! 🎉</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-sm font-medium text-foreground mb-1">No Outstanding Debt! 🎉</h3>
+            <p className="text-sm text-muted-foreground">
               Congratulations on being debt-free!
             </p>
           </div>
@@ -162,9 +161,9 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
         label: 'Outstanding Amount',
         data: debtCategories.map(debt => debt.value),
         backgroundColor: debtCategories.map(debt => debt.color),
-        borderColor: debtCategories.map(debt => debt.color),
+        borderColor: 'oklch(0.18 0.02 260)',
         borderWidth: 1,
-        borderRadius: 6,
+        borderRadius: 8,
         borderSkipped: false,
       },
     ],
@@ -173,18 +172,19 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    indexAxis: 'y' as const, // Horizontal bars
+    indexAxis: 'y' as const,
     plugins: {
       legend: {
-        display: false, // Hide legend for cleaner look
+        display: false,
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: 'rgb(255, 255, 255)',
-        bodyColor: 'rgb(255, 255, 255)',
-        borderColor: 'rgb(239, 68, 68)',
+        backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
+        titleColor: 'rgba(255, 255, 255, 0.95)',
+        bodyColor: 'rgba(255, 255, 255, 0.8)',
+        borderColor: 'oklch(0.4 0.02 260)',
         borderWidth: 1,
-        cornerRadius: 8,
+        cornerRadius: 12,
+        padding: 12,
         displayColors: true,
         callbacks: {
           label: (context: TooltipItem<'bar'>) => {
@@ -206,24 +206,24 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
         title: {
           display: true,
           text: 'Outstanding Amount (₹)',
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 12,
+            size: 11,
             weight: 500,
           },
         },
         ticks: {
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 11,
+            size: 10,
           },
           callback: function(value: string | number) {
             const num = typeof value === 'number' ? value : parseFloat(value);
-            if (num >= 10000000) { // 1 crore
+            if (num >= 10000000) {
               return `₹${(num / 10000000).toFixed(1)}Cr`;
-            } else if (num >= 100000) { // 1 lakh
+            } else if (num >= 100000) {
               return `₹${(num / 100000).toFixed(1)}L`;
-            } else if (num >= 1000) { // 1 thousand
+            } else if (num >= 1000) {
               return `₹${(num / 1000).toFixed(0)}K`;
             }
             return `₹${num.toFixed(0)}`;
@@ -231,15 +231,15 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
         },
         grid: {
           display: true,
-          color: 'rgba(229, 231, 235, 0.8)',
+          color: 'oklch(0.3 0.02 260 / 0.2)',
         },
       },
       y: {
         display: true,
         ticks: {
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.7)',
           font: {
-            size: 12,
+            size: 11,
           },
         },
         grid: {
@@ -254,57 +254,60 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="glass-card rounded-2xl p-6 hover-lift transition-all duration-300">
       {/* Chart Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Debt Composition</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <div className="w-1 h-5 rounded-full bg-gradient-to-b from-chart-5 to-destructive"></div>
+            Debt Composition
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Outstanding debt by category
           </p>
         </div>
 
         {/* Total Debt */}
         <div className="text-right">
-          <div className="text-sm text-gray-600">Total Outstanding</div>
-          <div className="text-xl font-bold text-red-600">
+          <div className="text-xs text-muted-foreground/70 uppercase tracking-wider">Total Outstanding</div>
+          <div className="text-xl font-bold text-destructive tabular-nums mt-1">
             {formatCurrency(totalDebt)}
           </div>
         </div>
       </div>
 
       {/* Chart Container */}
-      <div className="relative h-64 mb-6">
+      <div className="relative h-56 mb-6">
         <Bar data={chartData} options={chartOptions} />
       </div>
 
       {/* Debt Details */}
       <div className="space-y-3">
-        <div className="text-sm font-medium text-gray-700 mb-3">Breakdown Details:</div>
-        <div className="space-y-3">
+        <div className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">Breakdown Details</div>
+        <div className="space-y-2">
           {debtCategories.map((debt, index) => {
             const percentage = ((debt.value / totalDebt) * 100);
             return (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={index} className="flex items-center justify-between p-3 glass rounded-xl hover:bg-white/5 transition-colors">
                 <div className="flex items-center space-x-3">
                   <div 
-                    className="w-4 h-4 rounded flex-shrink-0"
+                    className="w-3 h-3 rounded flex-shrink-0"
                     style={{ backgroundColor: debt.color }}
                   />
                   <div>
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-foreground">
                       {debt.name}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-muted-foreground/70">
                       {debt.description}
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-semibold text-gray-900">
+                  <div className="text-sm font-semibold text-foreground tabular-nums">
                     {formatCurrency(debt.value)}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground/70 tabular-nums">
                     {percentage.toFixed(1)}%
                   </div>
                 </div>
@@ -315,42 +318,52 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
       </div>
 
       {/* Strategic Insights */}
-      <div className="mt-6 p-4 bg-red-50 rounded-lg">
-        <div className="flex items-start space-x-2">
-          <svg
-            className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-            />
-          </svg>
+      <div className="mt-6 p-4 glass rounded-xl border border-destructive/20">
+        <div className="flex items-start space-x-3">
+          <div className="p-1.5 rounded-lg bg-destructive/10">
+            <svg
+              className="w-4 h-4 text-destructive"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          </div>
           <div>
-            <div className="text-sm font-medium text-red-900 mb-2">Debt Management Strategy</div>
-            <div className="space-y-2 text-sm text-red-800">
+            <div className="text-sm font-medium text-destructive mb-2">Debt Management Strategy</div>
+            <div className="space-y-1.5 text-sm text-muted-foreground">
               {debtCategories.length > 1 && (
-                <div>• Consider focusing on the smallest debt first (debt snowball) or highest interest rate debt (debt avalanche)</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-destructive/70">•</span>
+                  Consider focusing on smallest debt first (snowball) or highest interest (avalanche)
+                </div>
               )}
-              <div>• Track monthly payments and interest rates for optimization</div>
-              <div>• Set up automatic payments to avoid missed payments and late fees</div>
-              <div>• Consider debt consolidation if you have multiple high-interest debts</div>
+              <div className="flex items-center gap-2">
+                <span className="text-destructive/70">•</span>
+                Track monthly payments and interest rates for optimization
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-destructive/70">•</span>
+                Set up automatic payments to avoid missed payments and late fees
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Chart Footer Note */}
-      <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500 text-center">
+      <div className="mt-4 pt-4 border-t border-border/30 text-xs text-muted-foreground/60 text-center">
         <div className="flex items-center justify-center space-x-4">
           <span>💡 Focus on high-interest debt first</span>
-          <span>•</span>
+          <span className="text-muted-foreground/30">•</span>
           <span>📊 Track progress monthly</span>
-          <span>•</span>
+          <span className="text-muted-foreground/30">•</span>
           <span>🎯 Set payoff goals</span>
         </div>
       </div>

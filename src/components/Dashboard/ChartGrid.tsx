@@ -44,19 +44,19 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
 }) => {
   return (
     <div className={cn(
-      'bg-white rounded-lg shadow-sm border border-gray-200',
+      'glass-card rounded-2xl hover-lift transition-all duration-300',
       fullWidth && 'col-span-full',
       className
     )}>
       {(title || subtitle) && (
         <div className="p-6 pb-0">
           {title && (
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            <h3 className="text-lg font-semibold text-foreground mb-1">
               {title}
             </h3>
           )}
           {subtitle && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               {subtitle}
             </p>
           )}
@@ -85,15 +85,21 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
 }) => {
   return (
     <div className={cn('space-y-6', className)}>
-      <div className="border-b border-gray-200 pb-4">
-        <h2 className="text-xl font-bold text-gray-900">
-          {title}
-        </h2>
-        {description && (
-          <p className="text-sm text-gray-600 mt-1">
-            {description}
-          </p>
-        )}
+      <div className="relative">
+        {/* Section header with gradient underline */}
+        <div className="pb-4">
+          <h2 className="text-xl font-bold text-foreground flex items-center gap-3">
+            <div className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-accent"></div>
+            {title}
+          </h2>
+          {description && (
+            <p className="text-sm text-muted-foreground mt-1 ml-4">
+              {description}
+            </p>
+          )}
+        </div>
+        {/* Gradient line */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-primary/30 via-accent/20 to-transparent"></div>
       </div>
       {children}
     </div>
@@ -117,8 +123,8 @@ export const ChartToggle: React.FC<ChartToggleProps> = ({
   onChartChange,
 }) => {
   return (
-    <div className="flex flex-wrap gap-2 p-4 bg-gray-50 rounded-lg mb-6">
-      <div className="text-sm font-medium text-gray-700 mr-3 py-2">
+    <div className="flex flex-wrap gap-2 p-4 glass rounded-xl mb-6">
+      <div className="text-sm font-medium text-muted-foreground mr-3 py-2">
         View:
       </div>
       {charts.map((chart) => (
@@ -126,11 +132,11 @@ export const ChartToggle: React.FC<ChartToggleProps> = ({
           key={chart.id}
           onClick={() => onChartChange(chart.id)}
           className={cn(
-            'flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
             activeChart === chart.id
-              ? 'bg-blue-100 text-blue-700 border border-blue-300'
-              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:text-gray-900'
+              ? 'bg-primary/20 text-primary border border-primary/30 shadow-lg shadow-primary/10'
+              : 'bg-secondary/50 text-muted-foreground border border-transparent hover:bg-secondary hover:text-foreground'
           )}
         >
           {chart.icon && (
@@ -164,20 +170,20 @@ export const QuickStats: React.FC<QuickStatsProps> = ({
     switch (trend) {
       case 'up':
         return (
-          <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17l9.2-9.2M17 17V7" />
+          <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
           </svg>
         );
       case 'down':
         return (
-          <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 7l-9.2 9.2M7 7v10" />
+          <svg className="w-4 h-4 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
         );
       default:
         return (
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h8" />
+          <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
           </svg>
         );
     }
@@ -186,15 +192,15 @@ export const QuickStats: React.FC<QuickStatsProps> = ({
   return (
     <div className={cn('grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6', className)}>
       {stats.map((stat, index) => (
-        <div key={index} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+        <div key={index} className="glass p-4 rounded-xl hover-lift transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs text-gray-500 uppercase tracking-wider">
+              <div className="text-xs text-muted-foreground/70 uppercase tracking-wider font-medium">
                 {stat.label}
               </div>
               <div className={cn(
-                'text-lg font-bold mt-1',
-                stat.color || 'text-gray-900'
+                'text-lg font-bold mt-1 tabular-nums',
+                stat.color || 'text-foreground'
               )}>
                 {stat.value}
               </div>
@@ -213,20 +219,23 @@ export const QuickStats: React.FC<QuickStatsProps> = ({
 
 // Loading state for chart grids
 export const ChartGridSkeleton: React.FC<{ count?: number }> = ({ count = 4 }) => {
+  // Static heights for skeleton bars
+  const barHeights = ['60%', '45%', '75%', '40%', '55%', '80%'];
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div key={i} className="glass-card rounded-2xl p-6">
           <div className="animate-pulse">
-            <div className="h-6 bg-gray-200 rounded w-1/3 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 mb-6"></div>
-            <div className="h-64 bg-gray-100 rounded-lg flex items-end justify-center space-x-2 p-4">
-              {[...Array(6)].map((_, i) => (
+            <div className="h-6 bg-muted rounded-lg w-1/3 mb-2"></div>
+            <div className="h-4 bg-muted/50 rounded-lg w-1/2 mb-6"></div>
+            <div className="h-64 bg-muted/30 rounded-xl flex items-end justify-center space-x-2 p-4">
+              {barHeights.map((height, j) => (
                 <div
-                  key={i}
-                  className="bg-gray-200 rounded-t"
+                  key={j}
+                  className="bg-muted/50 rounded-t animate-shimmer"
                   style={{
-                    height: `${Math.random() * 60 + 40}%`,
+                    height,
                     width: '12%',
                   }}
                 />
@@ -238,6 +247,3 @@ export const ChartGridSkeleton: React.FC<{ count?: number }> = ({ count = 4 }) =
     </div>
   );
 };
-
-
-

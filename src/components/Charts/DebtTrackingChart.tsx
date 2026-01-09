@@ -43,12 +43,12 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-96">
+      <div className="glass-card rounded-2xl p-6 h-96">
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-2xl glass mb-4">
               <svg
-                className="h-6 w-6 text-gray-400"
+                className="h-8 w-8 text-muted-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -56,13 +56,13 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
                 />
               </svg>
             </div>
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No Debt Data</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-sm font-medium text-foreground mb-1">No Debt Data</h3>
+            <p className="text-sm text-muted-foreground">
               Debt tracking data is not available.
             </p>
           </div>
@@ -96,19 +96,21 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
 
   const riskLevel = {
     level: currentRatio > 50 ? 'high' : currentRatio > 30 ? 'medium' : 'low',
-    color: currentRatio > 50 ? '#EF4444' : currentRatio > 30 ? '#F59E0B' : '#10B981',
+    color: currentRatio > 50 ? 'oklch(0.65 0.22 25)' : currentRatio > 30 ? 'oklch(0.75 0.18 85)' : 'oklch(0.72 0.19 165)',
+    textClass: currentRatio > 50 ? 'text-destructive' : currentRatio > 30 ? 'text-chart-4' : 'text-primary',
+    bgClass: currentRatio > 50 ? 'bg-destructive/10 border-destructive/30' : currentRatio > 30 ? 'bg-chart-4/10 border-chart-4/30' : 'bg-primary/10 border-primary/30',
     description: currentRatio > 50 ? 'High debt ratio requires attention' : 
                 currentRatio > 30 ? 'Moderate debt ratio - manageable' : 'Low debt ratio - healthy'
   };
 
   if (!hasDebtData) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-96">
+      <div className="glass-card rounded-2xl p-6 h-96">
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-2xl bg-primary/10 mb-4">
               <svg
-                className="h-6 w-6 text-green-500"
+                className="h-8 w-8 text-primary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -121,8 +123,8 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
                 />
               </svg>
             </div>
-            <h3 className="text-sm font-medium text-gray-900 mb-1">Debt Free! 🎉</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-sm font-medium text-foreground mb-1">Debt Free! 🎉</h3>
+            <p className="text-sm text-muted-foreground">
               You currently have no outstanding debt.
             </p>
           </div>
@@ -131,6 +133,12 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
     );
   }
 
+  // Chart colors for dark theme
+  const colors = {
+    debt: { main: 'oklch(0.65 0.22 25)', fill: 'oklch(0.65 0.22 25 / 0.15)' },
+    ratio: { main: 'oklch(0.75 0.18 85)', fill: 'oklch(0.75 0.18 85 / 0.1)' },
+  };
+
   // Chart configuration with dual-axis
   const chartData = {
     labels,
@@ -138,33 +146,33 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
       {
         label: 'Total Debt',
         data: debtValues,
-        borderColor: 'rgb(239, 68, 68)',
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        borderWidth: 3,
+        borderColor: colors.debt.main,
+        backgroundColor: colors.debt.fill,
+        borderWidth: 2,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: 'rgb(239, 68, 68)',
-        pointBorderColor: 'rgb(255, 255, 255)',
+        pointBackgroundColor: colors.debt.main,
+        pointBorderColor: 'oklch(0.18 0.02 260)',
         pointBorderWidth: 2,
-        pointRadius: 5,
-        pointHoverRadius: 7,
+        pointRadius: 4,
+        pointHoverRadius: 6,
         yAxisID: 'y',
       },
       {
         label: 'Debt-to-Asset Ratio',
         data: debtToAssetRatios,
-        borderColor: 'rgb(245, 158, 11)',
-        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-        borderWidth: 3,
+        borderColor: colors.ratio.main,
+        backgroundColor: colors.ratio.fill,
+        borderWidth: 2,
         fill: false,
         tension: 0.4,
-        pointBackgroundColor: 'rgb(245, 158, 11)',
-        pointBorderColor: 'rgb(255, 255, 255)',
+        pointBackgroundColor: colors.ratio.main,
+        pointBorderColor: 'oklch(0.18 0.02 260)',
         pointBorderWidth: 2,
-        pointRadius: 5,
-        pointHoverRadius: 7,
+        pointRadius: 4,
+        pointHoverRadius: 6,
         yAxisID: 'y1',
-        borderDash: [5, 5], // Dashed line to differentiate
+        borderDash: [5, 5],
       },
     ],
   };
@@ -180,20 +188,22 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
           usePointStyle: true,
           pointStyle: 'circle',
           padding: 20,
+          color: 'rgba(255, 255, 255, 0.7)',
           font: {
-            size: 12,
+            size: 11,
           },
         },
       },
       tooltip: {
         mode: 'index' as const,
         intersect: false,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: 'rgb(255, 255, 255)',
-        bodyColor: 'rgb(255, 255, 255)',
-        borderColor: 'rgb(239, 68, 68)',
+        backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
+        titleColor: 'rgba(255, 255, 255, 0.95)',
+        bodyColor: 'rgba(255, 255, 255, 0.8)',
+        borderColor: 'oklch(0.4 0.02 260)',
         borderWidth: 1,
-        cornerRadius: 8,
+        cornerRadius: 12,
+        padding: 12,
         displayColors: true,
         callbacks: {
           title: (context: TooltipItem<'line'>[]) => {
@@ -218,22 +228,22 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
         title: {
           display: true,
           text: 'Month',
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 12,
+            size: 11,
             weight: 500,
           },
         },
         ticks: {
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 11,
+            size: 10,
           },
           maxTicksLimit: 6,
         },
         grid: {
           display: true,
-          color: 'rgba(229, 231, 235, 0.8)',
+          color: 'oklch(0.3 0.02 260 / 0.2)',
         },
       },
       y: {
@@ -243,24 +253,24 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
         title: {
           display: true,
           text: 'Debt Amount (₹)',
-          color: 'rgb(239, 68, 68)',
+          color: colors.debt.main,
           font: {
-            size: 12,
+            size: 11,
             weight: 500,
           },
         },
         ticks: {
-          color: 'rgb(239, 68, 68)',
+          color: colors.debt.main,
           font: {
-            size: 11,
+            size: 10,
           },
           callback: function(value: string | number) {
             const num = typeof value === 'number' ? value : parseFloat(value);
-            if (num >= 10000000) { // 1 crore
+            if (num >= 10000000) {
               return `₹${(num / 10000000).toFixed(1)}Cr`;
-            } else if (num >= 100000) { // 1 lakh
+            } else if (num >= 100000) {
               return `₹${(num / 100000).toFixed(1)}L`;
-            } else if (num >= 1000) { // 1 thousand
+            } else if (num >= 1000) {
               return `₹${(num / 1000).toFixed(0)}K`;
             }
             return `₹${num.toFixed(0)}`;
@@ -277,18 +287,18 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
         title: {
           display: true,
           text: 'Debt Ratio (%)',
-          color: 'rgb(245, 158, 11)',
+          color: colors.ratio.main,
           font: {
-            size: 12,
+            size: 11,
             weight: 500,
           },
         },
         min: 0,
         max: 100,
         ticks: {
-          color: 'rgb(245, 158, 11)',
+          color: colors.ratio.main,
           font: {
-            size: 11,
+            size: 10,
           },
           callback: function(value: string | number) {
             return `${value}%`;
@@ -296,7 +306,7 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
         },
         grid: {
           display: true,
-          color: 'rgba(229, 231, 235, 0.8)',
+          color: 'oklch(0.3 0.02 260 / 0.2)',
         },
       },
     },
@@ -311,85 +321,87 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="glass-card rounded-2xl p-6 hover-lift transition-all duration-300">
       {/* Chart Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Debt Tracking</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <div className="w-1 h-5 rounded-full bg-gradient-to-b from-destructive to-chart-4"></div>
+            Debt Tracking
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Debt reduction progress over {selectedPeriod === 'all' ? 'all time' : `last ${selectedPeriod.replace('months', ' months').replace('month', ' month')}`}
           </p>
         </div>
 
         {/* Risk Level Indicator */}
         <div className="text-right">
-          <div className="text-sm text-gray-600">Risk Level</div>
-          <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium`}
-               style={{ backgroundColor: `${riskLevel.color}20`, color: riskLevel.color }}>
+          <div className="text-xs text-muted-foreground/70 uppercase tracking-wider">Risk Level</div>
+          <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium mt-1 border ${riskLevel.bgClass} ${riskLevel.textClass}`}>
             <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: riskLevel.color }}></div>
             {riskLevel.level.toUpperCase()}
           </div>
-          <div className="text-xs text-gray-500 mt-1">{riskLevel.description}</div>
+          <div className="text-xs text-muted-foreground/60 mt-1">{riskLevel.description}</div>
         </div>
       </div>
 
       {/* Chart Container */}
-      <div className="relative h-80 mb-6">
+      <div className="relative h-72 mb-6">
         <Line data={chartData} options={chartOptions} />
       </div>
 
       {/* Debt Analytics Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Current Debt */}
-        <div className="p-4 bg-red-50 rounded-lg">
+        <div className="p-4 glass rounded-xl border border-destructive/20">
           <div className="flex items-center space-x-2 mb-2">
-            <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="text-sm font-medium text-red-900">Current Debt</span>
+            <span className="text-xs font-medium text-destructive">Current Debt</span>
           </div>
-          <div className="text-lg font-bold text-red-700">
+          <div className="text-lg font-bold text-foreground tabular-nums">
             {formatCurrency(debtAnalytics.totalDebt)}
           </div>
         </div>
 
         {/* Debt-to-Asset Ratio */}
-        <div className="p-4 bg-yellow-50 rounded-lg">
+        <div className="p-4 glass rounded-xl border border-chart-4/20">
           <div className="flex items-center space-x-2 mb-2">
-            <svg className="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-chart-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            <span className="text-sm font-medium text-yellow-900">D/A Ratio</span>
+            <span className="text-xs font-medium text-chart-4">D/A Ratio</span>
           </div>
-          <div className="text-lg font-bold text-yellow-700">
+          <div className="text-lg font-bold text-foreground tabular-nums">
             {debtAnalytics.debtToAssetRatio.toFixed(1)}%
           </div>
         </div>
 
         {/* Monthly Reduction */}
-        <div className="p-4 bg-green-50 rounded-lg">
+        <div className="p-4 glass rounded-xl border border-primary/20">
           <div className="flex items-center space-x-2 mb-2">
-            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
-            <span className="text-sm font-medium text-green-900">Monthly Reduction</span>
+            <span className="text-xs font-medium text-primary">Monthly Reduction</span>
           </div>
-          <div className="text-lg font-bold text-green-700">
+          <div className={`text-lg font-bold tabular-nums ${debtAnalytics.monthlyReduction >= 0 ? 'text-primary' : 'text-destructive'}`}>
             {debtAnalytics.monthlyReduction >= 0 ? '+' : ''}{formatCurrency(debtAnalytics.monthlyReduction)}
           </div>
         </div>
 
         {/* Payoff Timeline */}
-        <div className="p-4 bg-blue-50 rounded-lg">
+        <div className="p-4 glass rounded-xl border border-chart-2/20">
           <div className="flex items-center space-x-2 mb-2">
-            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-chart-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="text-sm font-medium text-blue-900">Payoff Timeline</span>
+            <span className="text-xs font-medium text-chart-2">Payoff Timeline</span>
           </div>
-          <div className="text-lg font-bold text-blue-700">
+          <div className="text-lg font-bold text-foreground tabular-nums">
             {debtAnalytics.projectedPayoffMonths 
-              ? `${debtAnalytics.projectedPayoffMonths} months`
+              ? `${debtAnalytics.projectedPayoffMonths} mo`
               : 'N/A'
             }
           </div>
@@ -397,24 +409,26 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
       </div>
 
       {/* Progress Insight */}
-      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-        <div className="flex items-start space-x-2">
-          <svg
-            className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+      <div className="mt-4 p-4 glass rounded-xl">
+        <div className="flex items-start space-x-3">
+          <div className="p-1.5 rounded-lg bg-muted/30">
+            <svg
+              className="w-4 h-4 text-muted-foreground"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
           <div>
-            <div className="text-sm font-medium text-gray-900">Progress Insight</div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm font-medium text-foreground">Progress Insight</div>
+            <div className="text-sm text-muted-foreground mt-0.5">
               {debtAnalytics.monthlyReduction > 0 
                 ? `Great progress! You're reducing debt by ${formatCurrency(debtAnalytics.monthlyReduction)} per month on average.`
                 : debtAnalytics.monthlyReduction < 0

@@ -1,8 +1,12 @@
 // Custom hook for managing chart data and interactions
 
 import { useMemo } from 'react';
+import { Chart as ChartJS } from 'chart.js';
 import { NetWorthEntry, ChartDataPoint } from '@/lib/types';
 import { generateChartData, parseChartDate } from '@/lib/utils';
+
+// Set default device pixel ratio for crisp rendering on all charts
+ChartJS.defaults.devicePixelRatio = 2;
 
 interface UseChartDataReturn {
   chartData: ChartDataPoint[];
@@ -58,18 +62,28 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
         {
           label: 'Net Worth',
           data: values,
-          borderColor: 'rgb(59, 130, 246)', // Blue-500
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          borderWidth: 3,
+          borderColor: 'oklch(0.72 0.19 165)', // Primary emerald
+          backgroundColor: (context: { chart: { ctx: CanvasRenderingContext2D; chartArea?: { top: number; bottom: number } } }) => {
+            const ctx = context.chart.ctx;
+            const chartArea = context.chart.chartArea;
+            if (!chartArea) return 'oklch(0.72 0.19 165 / 0.1)';
+            
+            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0, 'oklch(0.72 0.19 165 / 0.3)');
+            gradient.addColorStop(0.5, 'oklch(0.72 0.19 165 / 0.1)');
+            gradient.addColorStop(1, 'oklch(0.72 0.19 165 / 0)');
+            return gradient;
+          },
+          borderWidth: 2.5,
           fill: true,
           tension: 0.4,
-          pointBackgroundColor: 'rgb(59, 130, 246)',
-          pointBorderColor: 'rgb(255, 255, 255)',
+          pointBackgroundColor: 'oklch(0.72 0.19 165)',
+          pointBorderColor: 'oklch(0.18 0.02 260)',
           pointBorderWidth: 2,
-          pointRadius: 6,
-          pointHoverRadius: 8,
-          pointHoverBackgroundColor: 'rgb(37, 99, 235)', // Blue-600
-          pointHoverBorderColor: 'rgb(255, 255, 255)',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointHoverBackgroundColor: 'oklch(0.75 0.2 165)',
+          pointHoverBorderColor: 'oklch(0.25 0.02 260)',
           pointHoverBorderWidth: 3,
         },
       ],
@@ -77,17 +91,19 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      devicePixelRatio: 2,
       plugins: {
         legend: {
           display: false, // Hide legend since we only have one dataset
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleColor: 'rgb(255, 255, 255)',
-          bodyColor: 'rgb(255, 255, 255)',
-          borderColor: 'rgb(59, 130, 246)',
+          backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
+          titleColor: 'rgba(255, 255, 255, 0.95)',
+          bodyColor: 'rgba(255, 255, 255, 0.85)',
+          borderColor: 'oklch(0.72 0.19 165 / 0.5)',
           borderWidth: 1,
-          cornerRadius: 8,
+          cornerRadius: 12,
+          padding: 12,
           displayColors: false,
           callbacks: {
             title: function(context: Array<{ label?: string }>) {
@@ -110,22 +126,22 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
           title: {
             display: true,
             text: 'Month',
-            color: 'rgb(107, 114, 128)', // Gray-500
+            color: 'rgba(255, 255, 255, 0.5)',
             font: {
-              size: 12,
+              size: 11,
               weight: 500,
             },
           },
           ticks: {
-            color: 'rgb(107, 114, 128)', // Gray-500
+            color: 'rgba(255, 255, 255, 0.5)',
             font: {
-              size: 11,
+              size: 10,
             },
             maxTicksLimit: 6,
           },
           grid: {
             display: true,
-            color: 'rgba(229, 231, 235, 0.8)', // Gray-200 with opacity
+            color: 'oklch(0.3 0.02 260 / 0.2)',
           },
         },
         y: {
@@ -133,16 +149,16 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
           title: {
             display: true,
             text: 'Net Worth (₹)',
-            color: 'rgb(107, 114, 128)', // Gray-500
+            color: 'rgba(255, 255, 255, 0.5)',
             font: {
-              size: 12,
+              size: 11,
               weight: 500,
             },
           },
           ticks: {
-            color: 'rgb(107, 114, 128)', // Gray-500
+            color: 'rgba(255, 255, 255, 0.5)',
             font: {
-              size: 11,
+              size: 10,
             },
             callback: function(value: string | number) {
               // Format large numbers with K/M/Cr suffixes
@@ -159,7 +175,7 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
           },
           grid: {
             display: true,
-            color: 'rgba(229, 231, 235, 0.8)', // Gray-200 with opacity
+            color: 'oklch(0.3 0.02 260 / 0.2)',
           },
         },
       },
@@ -173,7 +189,7 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
       },
       elements: {
         point: {
-          hoverRadius: 8,
+          hoverRadius: 6,
         },
       },
     },

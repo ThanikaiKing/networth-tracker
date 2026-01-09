@@ -43,12 +43,12 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-96">
+      <div className="glass-card rounded-2xl p-6 h-96">
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-2xl glass mb-4">
               <svg
-                className="h-6 w-6 text-gray-400"
+                className="h-8 w-8 text-muted-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -56,13 +56,13 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                 />
               </svg>
             </div>
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No Data Available</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-sm font-medium text-foreground mb-1">No Data Available</h3>
+            <p className="text-sm text-muted-foreground">
               Asset growth data is not available for the selected period.
             </p>
           </div>
@@ -82,6 +82,13 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
     return bankAccountsData[index] + investmentsData[index] + otherAssetsData[index];
   };
 
+  // Chart colors matching the dark theme
+  const colors = {
+    bank: { main: 'oklch(0.68 0.18 220)', fill: 'oklch(0.68 0.18 220 / 0.2)' },
+    investments: { main: 'oklch(0.72 0.19 165)', fill: 'oklch(0.72 0.19 165 / 0.2)' },
+    other: { main: 'oklch(0.7 0.2 280)', fill: 'oklch(0.7 0.2 280 / 0.2)' },
+  };
+
   // Chart configuration
   const chartData = {
     labels,
@@ -89,44 +96,44 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
       {
         label: 'Bank Accounts',
         data: bankAccountsData,
-        backgroundColor: 'rgba(59, 130, 246, 0.3)',
-        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: colors.bank.fill,
+        borderColor: colors.bank.main,
         borderWidth: 2,
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: 'rgb(59, 130, 246)',
-        pointBorderColor: 'rgb(255, 255, 255)',
+        pointBackgroundColor: colors.bank.main,
+        pointBorderColor: 'oklch(0.18 0.02 260)',
         pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        pointRadius: 3,
+        pointHoverRadius: 5,
       },
       {
         label: 'Investments',
         data: investmentsData,
-        backgroundColor: 'rgba(16, 185, 129, 0.3)',
-        borderColor: 'rgb(16, 185, 129)',
+        backgroundColor: colors.investments.fill,
+        borderColor: colors.investments.main,
         borderWidth: 2,
-        fill: '-1', // Fill to previous dataset
+        fill: '-1',
         tension: 0.4,
-        pointBackgroundColor: 'rgb(16, 185, 129)',
-        pointBorderColor: 'rgb(255, 255, 255)',
+        pointBackgroundColor: colors.investments.main,
+        pointBorderColor: 'oklch(0.18 0.02 260)',
         pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        pointRadius: 3,
+        pointHoverRadius: 5,
       },
       {
         label: 'Other Assets',
         data: otherAssetsData,
-        backgroundColor: 'rgba(139, 92, 246, 0.3)',
-        borderColor: 'rgb(139, 92, 246)',
+        backgroundColor: colors.other.fill,
+        borderColor: colors.other.main,
         borderWidth: 2,
-        fill: '-1', // Fill to previous dataset
+        fill: '-1',
         tension: 0.4,
-        pointBackgroundColor: 'rgb(139, 92, 246)',
-        pointBorderColor: 'rgb(255, 255, 255)',
+        pointBackgroundColor: colors.other.main,
+        pointBorderColor: 'oklch(0.18 0.02 260)',
         pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        pointRadius: 3,
+        pointHoverRadius: 5,
       },
     ],
   };
@@ -142,20 +149,22 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
           usePointStyle: true,
           pointStyle: 'circle',
           padding: 20,
+          color: 'rgba(255, 255, 255, 0.7)',
           font: {
-            size: 12,
+            size: 11,
           },
         },
       },
       tooltip: {
         mode: 'index' as const,
         intersect: false,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: 'rgb(255, 255, 255)',
-        bodyColor: 'rgb(255, 255, 255)',
-        borderColor: 'rgb(59, 130, 246)',
+        backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
+        titleColor: 'rgba(255, 255, 255, 0.95)',
+        bodyColor: 'rgba(255, 255, 255, 0.8)',
+        borderColor: 'oklch(0.4 0.02 260)',
         borderWidth: 1,
-        cornerRadius: 8,
+        cornerRadius: 12,
+        padding: 12,
         displayColors: true,
         callbacks: {
           title: (context: TooltipItem<'line'>[]) => {
@@ -182,48 +191,48 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
         title: {
           display: true,
           text: 'Month',
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 12,
+            size: 11,
             weight: 500,
           },
         },
         ticks: {
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 11,
+            size: 10,
           },
           maxTicksLimit: 6,
         },
         grid: {
           display: true,
-          color: 'rgba(229, 231, 235, 0.8)',
+          color: 'oklch(0.3 0.02 260 / 0.2)',
         },
       },
       y: {
-        stacked: true, // Enable stacking
+        stacked: true,
         display: true,
         title: {
           display: true,
           text: 'Asset Value (₹)',
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 12,
+            size: 11,
             weight: 500,
           },
         },
         ticks: {
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 11,
+            size: 10,
           },
           callback: function(value: string | number) {
             const num = typeof value === 'number' ? value : parseFloat(value);
-            if (num >= 10000000) { // 1 crore
+            if (num >= 10000000) {
               return `₹${(num / 10000000).toFixed(1)}Cr`;
-            } else if (num >= 100000) { // 1 lakh
+            } else if (num >= 100000) {
               return `₹${(num / 100000).toFixed(1)}L`;
-            } else if (num >= 1000) { // 1 thousand
+            } else if (num >= 1000) {
               return `₹${(num / 1000).toFixed(0)}K`;
             }
             return `₹${num.toFixed(0)}`;
@@ -231,7 +240,7 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
         },
         grid: {
           display: true,
-          color: 'rgba(229, 231, 235, 0.8)',
+          color: 'oklch(0.3 0.02 260 / 0.2)',
         },
       },
     },
@@ -245,7 +254,7 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
     },
     elements: {
       point: {
-        hoverRadius: 6,
+        hoverRadius: 5,
       },
     },
   };
@@ -264,72 +273,75 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
   const totalGrowth = bankGrowth + investmentGrowth + assetGrowth;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="glass-card rounded-2xl p-6 hover-lift transition-all duration-300">
       {/* Chart Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Asset Growth by Category</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <div className="w-1 h-5 rounded-full bg-gradient-to-b from-primary to-chart-2"></div>
+            Asset Growth by Category
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
             {selectedPeriod === 'all' ? 'All time' : `Last ${selectedPeriod.replace('months', ' months').replace('month', ' month')}`} stacked growth
           </p>
         </div>
 
         {/* Growth Summary */}
         <div className="text-right">
-          <div className="text-sm text-gray-600">Total Growth</div>
-          <div className={`text-xl font-bold ${totalGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {formatCurrency(Math.abs(totalGrowth))}
+          <div className="text-xs text-muted-foreground/70 uppercase tracking-wider">Total Growth</div>
+          <div className={`text-xl font-bold tabular-nums mt-1 ${totalGrowth >= 0 ? 'text-primary' : 'text-destructive'}`}>
+            {totalGrowth >= 0 ? '+' : ''}{formatCurrency(totalGrowth)}
           </div>
         </div>
       </div>
 
       {/* Chart Container */}
-      <div className="relative h-80 mb-6">
+      <div className="relative h-72 mb-6">
         <Line data={chartData} options={chartOptions} />
       </div>
 
       {/* Growth Statistics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 bg-blue-50 rounded-lg">
+        <div className="p-4 glass rounded-xl border border-chart-2/20">
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-            <span className="text-sm font-medium text-blue-900">Bank Accounts</span>
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colors.bank.main }}></div>
+            <span className="text-sm font-medium text-chart-2">Bank Accounts</span>
           </div>
           <div className="mt-2">
-            <div className={`text-lg font-bold ${bankGrowth >= 0 ? 'text-blue-700' : 'text-red-600'}`}>
+            <div className={`text-lg font-bold tabular-nums ${bankGrowth >= 0 ? 'text-primary' : 'text-destructive'}`}>
               {bankGrowth >= 0 ? '+' : ''}{formatCurrency(bankGrowth)}
             </div>
-            <div className="text-xs text-blue-600">
+            <div className="text-xs text-muted-foreground/70 tabular-nums">
               Current: {formatCurrency(bankAccountsData[bankAccountsData.length - 1] || 0)}
             </div>
           </div>
         </div>
 
-        <div className="p-4 bg-green-50 rounded-lg">
+        <div className="p-4 glass rounded-xl border border-primary/20">
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm font-medium text-green-900">Investments</span>
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colors.investments.main }}></div>
+            <span className="text-sm font-medium text-primary">Investments</span>
           </div>
           <div className="mt-2">
-            <div className={`text-lg font-bold ${investmentGrowth >= 0 ? 'text-green-700' : 'text-red-600'}`}>
+            <div className={`text-lg font-bold tabular-nums ${investmentGrowth >= 0 ? 'text-primary' : 'text-destructive'}`}>
               {investmentGrowth >= 0 ? '+' : ''}{formatCurrency(investmentGrowth)}
             </div>
-            <div className="text-xs text-green-600">
+            <div className="text-xs text-muted-foreground/70 tabular-nums">
               Current: {formatCurrency(investmentsData[investmentsData.length - 1] || 0)}
             </div>
           </div>
         </div>
 
-        <div className="p-4 bg-purple-50 rounded-lg">
+        <div className="p-4 glass rounded-xl border border-accent/20">
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-            <span className="text-sm font-medium text-purple-900">Other Assets</span>
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colors.other.main }}></div>
+            <span className="text-sm font-medium text-accent">Other Assets</span>
           </div>
           <div className="mt-2">
-            <div className={`text-lg font-bold ${assetGrowth >= 0 ? 'text-purple-700' : 'text-red-600'}`}>
+            <div className={`text-lg font-bold tabular-nums ${assetGrowth >= 0 ? 'text-primary' : 'text-destructive'}`}>
               {assetGrowth >= 0 ? '+' : ''}{formatCurrency(assetGrowth)}
             </div>
-            <div className="text-xs text-purple-600">
+            <div className="text-xs text-muted-foreground/70 tabular-nums">
               Current: {formatCurrency(otherAssetsData[otherAssetsData.length - 1] || 0)}
             </div>
           </div>
@@ -337,7 +349,7 @@ export const AssetGrowthChart: React.FC<AssetGrowthChartProps> = ({
       </div>
 
       {/* Chart Info Footer */}
-      <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500 text-center">
+      <div className="mt-4 pt-4 border-t border-border/30 text-xs text-muted-foreground/60 text-center">
         Stacked areas show cumulative asset composition over time • Hover for detailed breakdowns
       </div>
     </div>

@@ -30,18 +30,23 @@ ChartJS.register(
   Legend
 );
 
-// Investment color configuration
+// Set default device pixel ratio for crisp rendering
+ChartJS.defaults.devicePixelRatio = 2;
+
+// Investment color configuration - updated for dark theme
 const INVESTMENT_COLORS: Record<string, string> = {
-  'Equity': '#3B82F6',      // Blue
-  'Mutual funds': '#10B981', // Green  
-  'Gold': '#F59E0B',        // Amber
-  'EPF': '#8B5CF6',         // Purple
-  'NPS': '#06B6D4',         // Cyan
-  'FD': '#84CC16',          // Lime
-  'BetterInvest': '#F97316', // Orange
-  'Walmart shares': '#EF4444', // Red
-  // Fallback colors for unknown investments
-  'Unknown': '#6B7280',     // Gray
+  'Equity': 'oklch(0.68 0.18 220)',      // Blue
+  'Mutual funds': 'oklch(0.72 0.19 165)', // Emerald  
+  'Gold': 'oklch(0.75 0.18 85)',         // Amber
+  'EPF': 'oklch(0.7 0.2 280)',           // Purple
+  'NPS': 'oklch(0.7 0.15 195)',          // Cyan
+  'FD': 'oklch(0.7 0.18 140)',           // Lime
+  'BetterInvest': 'oklch(0.7 0.2 35)',   // Orange
+  'Walmart shares': 'oklch(0.65 0.22 25)', // Red
+  'US Stocks': 'oklch(0.65 0.18 250)',   // Indigo
+  'Bhive': 'oklch(0.68 0.15 320)',       // Pink
+  'Aston grey': 'oklch(0.5 0.02 260)',   // Gray
+  'Unknown': 'oklch(0.5 0.02 260)',      // Gray
 };
 
 // Get color for investment, with fallback
@@ -126,18 +131,18 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
       label: investment.name,
       data: investment.data.map(point => point.y),
       borderColor: investment.color,
-      backgroundColor: investment.color + '20', // 20% opacity
+      backgroundColor: investment.color.replace(')', ' / 0.15)').replace('oklch', 'oklch'),
       fill: false,
       tension: 0.4,
-      pointRadius: 4,
-      pointHoverRadius: 6,
+      pointRadius: 3,
+      pointHoverRadius: 5,
       pointBackgroundColor: investment.color,
-      pointBorderColor: '#ffffff',
+      pointBorderColor: 'oklch(0.18 0.02 260)',
       pointBorderWidth: 2,
       pointHoverBackgroundColor: investment.color,
-      pointHoverBorderColor: '#ffffff',
+      pointHoverBorderColor: 'oklch(0.25 0.02 260)',
       pointHoverBorderWidth: 2,
-      borderWidth: 2.5,
+      borderWidth: 2,
     }));
 
     return { labels, datasets };
@@ -149,12 +154,12 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-96">
+      <div className="glass-card rounded-2xl p-6 h-96">
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-2xl glass mb-4">
               <svg
-                className="h-6 w-6 text-gray-400"
+                className="h-8 w-8 text-muted-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -162,13 +167,13 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
                 />
               </svg>
             </div>
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No Investment Data</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-sm font-medium text-foreground mb-1">No Investment Data</h3>
+            <p className="text-sm text-muted-foreground">
               Investment growth data is not available.
             </p>
           </div>
@@ -181,6 +186,7 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    devicePixelRatio: 2,
     interaction: {
       mode: 'index' as const,
       intersect: false,
@@ -192,22 +198,22 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
           usePointStyle: true,
           pointStyle: 'circle',
           font: { 
-            size: 12, 
+            size: 10, 
             weight: 500 
           },
-          color: 'rgb(107, 114, 128)',
-          padding: 20,
-          boxWidth: 8,
-          boxHeight: 8,
+          color: 'rgba(255, 255, 255, 0.7)',
+          padding: 15,
+          boxWidth: 6,
+          boxHeight: 6,
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: 'rgb(255, 255, 255)',
-        bodyColor: 'rgb(255, 255, 255)',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
+        titleColor: 'rgba(255, 255, 255, 0.95)',
+        bodyColor: 'rgba(255, 255, 255, 0.8)',
+        borderColor: 'oklch(0.4 0.02 260)',
         borderWidth: 1,
-        cornerRadius: 8,
+        cornerRadius: 12,
         padding: 12,
         displayColors: true,
         callbacks: {
@@ -231,9 +237,6 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
             
             return `${context.dataset.label}: ${formatCurrency(value)}${growthText}`;
           },
-          afterLabel: () => {
-            return 'Click legend to toggle visibility';
-          },
         },
       },
     },
@@ -243,22 +246,22 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
         title: {
           display: true,
           text: 'Month',
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 12,
+            size: 11,
             weight: 500,
           },
         },
         ticks: {
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 11,
+            size: 10,
           },
           maxRotation: 45,
         },
         grid: {
           display: true,
-          color: 'rgba(229, 231, 235, 0.8)',
+          color: 'oklch(0.3 0.02 260 / 0.2)',
         },
       },
       y: {
@@ -266,16 +269,16 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
         title: {
           display: true,
           text: 'Investment Value (₹)',
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 12,
+            size: 11,
             weight: 500,
           },
         },
         ticks: {
-          color: 'rgb(107, 114, 128)',
+          color: 'rgba(255, 255, 255, 0.5)',
           font: {
-            size: 11,
+            size: 10,
           },
           callback: function(value: string | number) {
             const num = typeof value === 'number' ? value : parseFloat(value);
@@ -284,7 +287,7 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
         },
         grid: {
           display: true,
-          color: 'rgba(229, 231, 235, 0.8)',
+          color: 'oklch(0.3 0.02 260 / 0.2)',
         },
         beginAtZero: false,
       },
@@ -312,24 +315,27 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
     : 0;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="glass-card rounded-2xl p-6 hover-lift transition-all duration-300">
       {/* Chart Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Investment Growth</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <div className="w-1 h-5 rounded-full bg-gradient-to-b from-chart-2 to-primary"></div>
+            Investment Growth
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Individual investment performance over time
           </p>
         </div>
 
         {/* Investment Summary */}
         <div className="text-right">
-          <div className="text-sm text-gray-600">Total Investments</div>
-          <div className="text-xl font-bold text-blue-600">
+          <div className="text-xs text-muted-foreground/70 uppercase tracking-wider">Total Investments</div>
+          <div className="text-xl font-bold text-chart-2 tabular-nums mt-1">
             {formatCurrency(totalCurrentValue)}
           </div>
-          <div className={`text-sm font-medium ${
-            totalGrowth >= 0 ? 'text-green-600' : 'text-red-600'
+          <div className={`text-sm font-medium tabular-nums ${
+            totalGrowth >= 0 ? 'text-primary' : 'text-destructive'
           }`}>
             {totalGrowth >= 0 ? '+' : ''}{formatCurrency(totalGrowth)} 
             ({totalGrowthPercentage >= 0 ? '+' : ''}{totalGrowthPercentage.toFixed(1)}%)
@@ -344,8 +350,8 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
         ) : (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-2">No investment data to display</div>
-              <div className="text-xs text-gray-400">
+              <div className="text-sm text-muted-foreground mb-2">No investment data to display</div>
+              <div className="text-xs text-muted-foreground/60">
                 Try adjusting the time period or check if investment data is available
               </div>
             </div>
@@ -356,51 +362,51 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
       {/* Investment Insights */}
       {chartData.datasets.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-blue-50 rounded-lg p-4">
+          <div className="glass rounded-xl p-4 border border-chart-2/20">
             <div className="flex items-center space-x-2">
-              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-chart-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
-              <div className="text-sm font-medium text-blue-900">Active Investments</div>
+              <div className="text-sm font-medium text-chart-2">Active Investments</div>
             </div>
-            <div className="text-2xl font-bold text-blue-600 mt-2">
+            <div className="text-2xl font-bold text-foreground mt-2 tabular-nums">
               {chartData.datasets.length}
             </div>
-            <div className="text-xs text-blue-700 mt-1">
+            <div className="text-xs text-muted-foreground/70 mt-1">
               Different investment types
             </div>
           </div>
 
-          <div className="bg-green-50 rounded-lg p-4">
+          <div className="glass rounded-xl p-4 border border-primary/20">
             <div className="flex items-center space-x-2">
-              <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <div className="text-sm font-medium text-green-900">Period</div>
+              <div className="text-sm font-medium text-primary">Period</div>
             </div>
-            <div className="text-2xl font-bold text-green-600 mt-2">
+            <div className="text-2xl font-bold text-foreground mt-2">
               {selectedPeriod === 'all' ? 'All Time' : 
                selectedPeriod === '6months' ? '6M' :
                selectedPeriod === '3months' ? '3M' : '1M'}
             </div>
-            <div className="text-xs text-green-700 mt-1">
+            <div className="text-xs text-muted-foreground/70 mt-1">
               Tracking period
             </div>
           </div>
 
-          <div className="bg-purple-50 rounded-lg p-4">
+          <div className="glass rounded-xl p-4 border border-accent/20">
             <div className="flex items-center space-x-2">
-              <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              <div className="text-sm font-medium text-purple-900">Avg Growth</div>
+              <div className="text-sm font-medium text-accent">Avg Growth</div>
             </div>
-            <div className={`text-2xl font-bold mt-2 ${
-              totalGrowthPercentage >= 0 ? 'text-green-600' : 'text-red-600'
+            <div className={`text-2xl font-bold mt-2 tabular-nums ${
+              totalGrowthPercentage >= 0 ? 'text-primary' : 'text-destructive'
             }`}>
               {totalGrowthPercentage >= 0 ? '+' : ''}{totalGrowthPercentage.toFixed(1)}%
             </div>
-            <div className="text-xs text-purple-700 mt-1">
+            <div className="text-xs text-muted-foreground/70 mt-1">
               Overall performance
             </div>
           </div>
@@ -408,12 +414,12 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
       )}
 
       {/* Chart Footer Note */}
-      <div className="mt-6 pt-4 border-t border-gray-100 text-xs text-gray-500 text-center">
+      <div className="mt-6 pt-4 border-t border-border/30 text-xs text-muted-foreground/60 text-center">
         <div className="flex items-center justify-center space-x-4">
           <span>💡 Click legend items to show/hide investments</span>
-          <span>•</span>
+          <span className="text-muted-foreground/30">•</span>
           <span>📈 Hover over points for detailed info</span>
-          <span>•</span>
+          <span className="text-muted-foreground/30">•</span>
           <span>🎯 Track individual performance</span>
         </div>
       </div>

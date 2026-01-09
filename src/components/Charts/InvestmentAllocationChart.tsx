@@ -18,29 +18,36 @@ import { SkeletonChart } from '@/components/common/LoadingSpinner';
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-// Investment color configuration (same as InvestmentGrowthChart)
+// Set default device pixel ratio for crisp rendering
+ChartJS.defaults.devicePixelRatio = 2;
+
+// Investment color configuration - dark theme
 const INVESTMENT_COLORS: Record<string, string> = {
-  'Equity': '#3B82F6',      // Blue
-  'Mutual funds': '#10B981', // Green  
-  'Gold': '#F59E0B',        // Amber
-  'EPF': '#8B5CF6',         // Purple
-  'NPS': '#06B6D4',         // Cyan
-  'FD': '#84CC16',          // Lime
-  'BetterInvest': '#F97316', // Orange
-  'Walmart shares': '#EF4444', // Red
+  'Equity': 'oklch(0.68 0.18 220)',      // Blue
+  'Mutual funds': 'oklch(0.72 0.19 165)', // Emerald  
+  'Gold': 'oklch(0.75 0.18 85)',         // Amber
+  'EPF': 'oklch(0.7 0.2 280)',           // Purple
+  'NPS': 'oklch(0.7 0.15 195)',          // Cyan
+  'FD': 'oklch(0.7 0.18 140)',           // Lime
+  'BetterInvest': 'oklch(0.7 0.2 35)',   // Orange
+  'Walmart shares': 'oklch(0.65 0.22 25)', // Red
+  'US Stocks': 'oklch(0.65 0.18 250)',   // Indigo
+  'Bhive': 'oklch(0.68 0.15 320)',       // Pink
+  'Aston grey': 'oklch(0.5 0.02 260)',   // Gray
 };
 
 // Asset class colors for category-based view
 const ASSET_CLASS_COLORS: Record<string, string> = {
-  'equity': '#3B82F6',      // Blue
-  'debt': '#10B981',        // Green
-  'hybrid': '#F59E0B',      // Amber
-  'alternative': '#8B5CF6', // Purple
+  'equity': 'oklch(0.68 0.18 220)',      // Blue
+  'debt': 'oklch(0.72 0.19 165)',        // Emerald
+  'hybrid': 'oklch(0.75 0.18 85)',       // Amber
+  'alternative': 'oklch(0.7 0.2 280)',   // Purple
+  'other': 'oklch(0.5 0.02 260)',        // Gray
 };
 
 // Get color for investment
 const getInvestmentColor = (investmentName: string): string => {
-  return INVESTMENT_COLORS[investmentName] || '#6B7280';
+  return INVESTMENT_COLORS[investmentName] || 'oklch(0.5 0.02 260)';
 };
 
 // Categorize investments into asset classes
@@ -110,14 +117,13 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
       name,
       value,
       percentage: total > 0 ? (value / total) * 100 : 0,
-      color: ASSET_CLASS_COLORS[name.toLowerCase()] || '#6B7280'
+      color: ASSET_CLASS_COLORS[name.toLowerCase()] || 'oklch(0.5 0.02 260)'
     }));
 
     // Create chart data
     const chartLabels = investmentData.map(item => item.name);
     const chartValues = investmentData.map(item => item.value);
     const chartColors = investmentData.map(item => item.color);
-    const chartBorderColors = chartColors.map(color => color);
 
     return {
       chartData: {
@@ -126,9 +132,10 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
           {
             data: chartValues,
             backgroundColor: chartColors,
-            borderColor: chartBorderColors,
+            borderColor: 'oklch(0.18 0.02 260)',
             borderWidth: 2,
             hoverBorderWidth: 3,
+            hoverBorderColor: 'oklch(0.3 0.02 260)',
             hoverOffset: 8,
           },
         ],
@@ -145,12 +152,12 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-96">
+      <div className="glass-card rounded-2xl p-6 h-96">
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-2xl glass mb-4">
               <svg
-                className="h-6 w-6 text-gray-400"
+                className="h-8 w-8 text-muted-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -158,19 +165,19 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
                 />
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"
                 />
               </svg>
             </div>
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No Investment Data</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-sm font-medium text-foreground mb-1">No Investment Data</h3>
+            <p className="text-sm text-muted-foreground">
               Investment allocation data is not available.
             </p>
           </div>
@@ -183,6 +190,7 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    devicePixelRatio: 2,
     plugins: {
       legend: {
         position: 'right' as const,
@@ -190,13 +198,13 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
           usePointStyle: true,
           pointStyle: 'circle',
           font: {
-            size: 11,
+            size: 10,
             weight: 500
           },
-          color: 'rgb(107, 114, 128)',
-          padding: 15,
-          boxWidth: 10,
-          boxHeight: 10,
+          color: 'rgba(255, 255, 255, 0.7)',
+          padding: 12,
+          boxWidth: 8,
+          boxHeight: 8,
           generateLabels: (chart: ChartJS) => {
             const data = chart.data;
             if (data.labels?.length && data.datasets.length) {
@@ -205,8 +213,8 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
                 const percentage = totalInvestments > 0 ? ((value / totalInvestments) * 100) : 0;
                 return {
                   text: `${label} (${percentage.toFixed(1)}%)`,
-                  fillStyle: (data.datasets[0].backgroundColor as string[])?.[index] || '#6B7280',
-                  strokeStyle: (data.datasets[0].borderColor as string[])?.[index] || '#6B7280',
+                  fillStyle: (data.datasets[0].backgroundColor as string[])?.[index] || 'oklch(0.5 0.02 260)',
+                  strokeStyle: 'oklch(0.18 0.02 260)',
                   lineWidth: 2,
                   hidden: false,
                   index,
@@ -218,12 +226,12 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: 'rgb(255, 255, 255)',
-        bodyColor: 'rgb(255, 255, 255)',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
+        titleColor: 'rgba(255, 255, 255, 0.95)',
+        bodyColor: 'rgba(255, 255, 255, 0.8)',
+        borderColor: 'oklch(0.4 0.02 260)',
         borderWidth: 1,
-        cornerRadius: 8,
+        cornerRadius: 12,
         padding: 12,
         displayColors: true,
         callbacks: {
@@ -240,7 +248,7 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
         },
       },
     },
-    cutout: '45%', // Makes it a doughnut chart
+    cutout: '50%',
     animation: {
       animateRotate: true,
       duration: 750,
@@ -248,20 +256,23 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="glass-card rounded-2xl p-6 hover-lift transition-all duration-300">
       {/* Chart Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Investment Allocation</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <div className="w-1 h-5 rounded-full bg-gradient-to-b from-accent to-chart-2"></div>
+            Investment Allocation
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Portfolio distribution by investment type
           </p>
         </div>
 
         {/* Total Investment Value */}
         <div className="text-right">
-          <div className="text-sm text-gray-600">Total Invested</div>
-          <div className="text-xl font-bold text-blue-600">
+          <div className="text-xs text-muted-foreground/70 uppercase tracking-wider">Total Invested</div>
+          <div className="text-xl font-bold text-chart-2 tabular-nums mt-1">
             {formatCurrency(totalInvestments)}
           </div>
         </div>
@@ -269,44 +280,35 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart Container */}
-        <div className="relative h-80">
+        <div className="relative h-72">
           <Doughnut data={chartData} options={chartOptions} />
-          {/* Center label with total value */}
-          {/* <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center">
-              <div className="text-xs text-gray-500">Total</div>
-              <div className="text-lg font-bold text-gray-900">
-                {formatCurrencyShort(totalInvestments)}
-              </div>
-            </div>
-          </div> */}
         </div>
 
         {/* Investment Breakdown List */}
         <div className="space-y-3">
-          <div className="text-sm font-medium text-gray-700 mb-3">Investment Breakdown:</div>
-          <div className="space-y-2 max-h-64 overflow-y-auto">
+          <div className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wider">Investment Breakdown</div>
+          <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
             {investmentBreakdown.map((investment, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div key={index} className="flex items-center justify-between p-3 glass rounded-xl hover:bg-white/5 transition-colors">
                 <div className="flex items-center space-x-3">
                   <div
-                    className="w-4 h-4 rounded flex-shrink-0"
+                    className="w-3 h-3 rounded flex-shrink-0"
                     style={{ backgroundColor: investment.color }}
                   />
                   <div>
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-foreground">
                       {investment.name}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-muted-foreground/70">
                       {investment.category}
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-semibold text-gray-900">
+                  <div className="text-sm font-semibold text-foreground tabular-nums">
                     {formatCurrencyShort(investment.value)}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground/70 tabular-nums">
                     {investment.percentage.toFixed(1)}%
                   </div>
                 </div>
@@ -317,22 +319,24 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
       </div>
 
       {/* Asset Class Summary */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-        <div className="flex items-start space-x-2">
-          <svg className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-          </svg>
+      <div className="mt-6 p-4 glass rounded-xl border border-chart-2/20">
+        <div className="flex items-start space-x-3">
+          <div className="p-1.5 rounded-lg bg-chart-2/10">
+            <svg className="w-4 h-4 text-chart-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+            </svg>
+          </div>
           <div className="flex-1">
-            <div className="text-sm font-medium text-blue-900 mb-3">Asset Class Distribution</div>
+            <div className="text-sm font-medium text-chart-2 mb-3">Asset Class Distribution</div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {assetClassBreakdown.map((assetClass, index) => (
-                <div key={index} className="text-center">
-                  <div className="text-xs text-blue-800 font-medium">{assetClass.name}</div>
-                  <div className="text-sm font-bold text-blue-900">
+                <div key={index} className="text-center p-2 glass rounded-lg">
+                  <div className="text-xs text-muted-foreground/70">{assetClass.name}</div>
+                  <div className="text-sm font-bold text-foreground tabular-nums">
                     {assetClass.percentage.toFixed(1)}%
                   </div>
-                  <div className="text-xs text-blue-700">
+                  <div className="text-xs text-muted-foreground/50 tabular-nums">
                     {formatCurrencyShort(assetClass.value)}
                   </div>
                 </div>
@@ -343,23 +347,40 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
       </div>
 
       {/* Diversification Insights */}
-      <div className="mt-4 p-4 bg-green-50 rounded-lg">
-        <div className="flex items-start space-x-2">
-          <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+      <div className="mt-4 p-4 glass rounded-xl border border-primary/20">
+        <div className="flex items-start space-x-3">
+          <div className="p-1.5 rounded-lg bg-primary/10">
+            <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
           <div>
-            <div className="text-sm font-medium text-green-900 mb-2">Portfolio Insights</div>
-            <div className="space-y-1 text-sm text-green-800">
-              <div>• {investmentBreakdown.length} different investment types</div>
-              <div>• {assetClassBreakdown.length} asset classes represented</div>
+            <div className="text-sm font-medium text-primary mb-2">Portfolio Insights</div>
+            <div className="space-y-1 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span className="text-primary/70">•</span>
+                <span>{investmentBreakdown.length} different investment types</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-primary/70">•</span>
+                <span>{assetClassBreakdown.length} asset classes represented</span>
+              </div>
               {investmentBreakdown.length > 0 && (
-                <div>• Largest allocation: {investmentBreakdown[0].name} ({investmentBreakdown[0].percentage.toFixed(1)}%)</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-primary/70">•</span>
+                  <span>Largest allocation: {investmentBreakdown[0].name} ({investmentBreakdown[0].percentage.toFixed(1)}%)</span>
+                </div>
               )}
               {investmentBreakdown.length >= 5 ? (
-                <div>• Well diversified portfolio ✓</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-primary/70">•</span>
+                  <span>Well diversified portfolio ✓</span>
+                </div>
               ) : (
-                <div>• Consider diversifying across more investment types</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-primary/70">•</span>
+                  <span>Consider diversifying across more investment types</span>
+                </div>
               )}
             </div>
           </div>
@@ -367,12 +388,12 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
       </div>
 
       {/* Chart Footer Note */}
-      <div className="mt-6 pt-4 border-t border-gray-100 text-xs text-gray-500 text-center">
+      <div className="mt-6 pt-4 border-t border-border/30 text-xs text-muted-foreground/60 text-center">
         <div className="flex items-center justify-center space-x-4">
           <span>💡 Click segments to highlight details</span>
-          <span>•</span>
+          <span className="text-muted-foreground/30">•</span>
           <span>📊 Based on latest month data</span>
-          <span>•</span>
+          <span className="text-muted-foreground/30">•</span>
           <span>🎯 Review allocation quarterly</span>
         </div>
       </div>
