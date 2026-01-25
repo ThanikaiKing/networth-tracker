@@ -26,7 +26,7 @@ export const SHEET_ROWS = {
   
   // Investment Accounts (rows 22-32) - now includes all investments
   INVESTMENT_ACCOUNTS_START: 21, // Row 22 (Equity)
-  INVESTMENT_ACCOUNTS_END: 31,   // Row 32 (Aston grey) - expanded to include real estate
+  INVESTMENT_ACCOUNTS_END: 32,   // Row 32 (Aston grey) - expanded to include real estate
   INVESTMENT_SUBTOTAL: 35, // Row 36
   
   // Other Assets (now empty since real estate moved to investments)
@@ -36,7 +36,7 @@ export const SHEET_ROWS = {
   
   // Debt (rows 55-56)
   DEBT_START: 54, // Row 55 (Home loan)
-  DEBT_END: 55,   // Row 56 (Personal loan)
+  DEBT_END: 56,   // Row 56 (Personal loan)
   DEBT_SUBTOTAL: 65, // Row 66
   
   // Summary rows

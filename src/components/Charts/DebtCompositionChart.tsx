@@ -118,7 +118,7 @@ export const DebtCompositionChart: React.FC<DebtCompositionChartProps> = ({
         value: totalDebt * 0.15,
         color: 'oklch(0.7 0.2 35)',
         description: 'Personal/consumer loans'
-      }
+      },
     );
   }
 

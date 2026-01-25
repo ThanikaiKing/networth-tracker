@@ -32,8 +32,9 @@ const INVESTMENT_COLORS: Record<string, string> = {
   'BetterInvest': 'oklch(0.7 0.2 35)',   // Orange
   'Walmart shares': 'oklch(0.65 0.22 25)', // Red
   'US Stocks': 'oklch(0.65 0.18 250)',   // Indigo
-  'Bhive': 'oklch(0.68 0.15 320)',       // Pink
-  'Aston grey': 'oklch(0.5 0.02 260)',   // Gray
+  'Bhive': 'oklch(0.7 0.15 45)',
+  'Aston grey': 'oklch(0.68 0.15 320)',       // Pink
+  'Estates by Per Annum': 'oklch(0.68 0.12 210)',       // Pink
 };
 
 // Asset class colors for category-based view
