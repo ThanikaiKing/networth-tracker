@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -17,10 +17,10 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-const dmMono = DM_Mono({
+const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  weight: ["300", "400", "500", "600"],
   display: "swap",
 });
 
@@ -45,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable} antialiased`}
+        className={`${cormorant.variable} ${dmSans.variable} ${ibmPlexMono.variable} antialiased`}
       >
         {children}
       </body>

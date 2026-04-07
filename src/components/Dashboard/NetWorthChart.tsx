@@ -114,15 +114,13 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
           <div>
             <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Peak</span>
             <p className="font-medium text-primary tabular-nums mt-0.5" style={{ fontFamily: 'var(--font-mono)' }}>
-              <span style={{ fontFamily: 'var(--font-sans)', fontSize: '0.85em' }}>₹</span>
-              {new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.max(...data.map(d => d.netWorth)))}
+              {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.max(...data.map(d => d.netWorth)))}
             </p>
           </div>
           <div>
             <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Trough</span>
             <p className="font-medium text-muted-foreground tabular-nums mt-0.5" style={{ fontFamily: 'var(--font-mono)' }}>
-              <span style={{ fontFamily: 'var(--font-sans)', fontSize: '0.85em' }}>₹</span>
-              {new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.min(...data.map(d => d.netWorth)))}
+              {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.min(...data.map(d => d.netWorth)))}
             </p>
           </div>
         </div>

@@ -51,12 +51,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
       </p>
 
       <p className="text-[2.1rem] font-bold leading-none text-foreground tabular-nums" style={{ fontFamily: 'var(--font-mono)' }}>
-        {value.startsWith('₹') ? (
-          <>
-            <span className="text-[1.1rem] font-semibold align-baseline" style={{ fontFamily: 'var(--font-sans)' }}>₹</span>
-            {value.slice(1)}
-          </>
-        ) : value}
+        {value}
       </p>
 
       {subtitle && (
@@ -69,16 +64,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
             className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${badgeClass}`}
           >
             <span>{trendArrow}</span>
-            <span className="tabular-nums">
-            {trendValue.startsWith('₹') || trendValue.startsWith('-₹') ? (
-              <>
-                <span style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9em' }}>
-                  {trendValue.startsWith('-') ? '-₹' : '₹'}
-                </span>
-                {trendValue.replace(/^-?₹/, '')}
-              </>
-            ) : trendValue}
-          </span>
+            <span className="tabular-nums">{trendValue}</span>
           </span>
           <span className="text-[11px] text-muted-foreground/60">vs start of period</span>
         </div>
