@@ -12,7 +12,7 @@ import {
 } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { InvestmentAllocationChartProps } from '@/lib/types';
-import { formatCurrency, formatCurrencyShort } from '@/lib/utils';
+import { formatCurrency, formatCurrencyShort, getInvestmentAssetClass } from '@/lib/utils';
 import { SkeletonChart } from '@/components/common/LoadingSpinner';
 
 // Register Chart.js components
@@ -35,39 +35,23 @@ const INVESTMENT_COLORS: Record<string, string> = {
   'US Stocks': 'oklch(0.65 0.18 250)',   // Indigo
   'Bhive': 'oklch(0.7 0.15 45)',
   'Aston grey': 'oklch(0.68 0.15 320)',       // Pink
-  'Estates by Per Annum': 'oklch(0.68 0.12 210)',       // Pink
+  'Estates - Per Annum': 'oklch(0.68 0.12 210)',
 };
 
 // Asset class colors for category-based view
 const ASSET_CLASS_COLORS: Record<string, string> = {
-  'equity': 'oklch(0.68 0.18 220)',      // Blue
-  'debt': 'oklch(0.72 0.19 165)',        // Emerald
-  'hybrid': 'oklch(0.75 0.18 85)',       // Amber
-  'alternative': 'oklch(0.7 0.2 280)',   // Purple
-  'other': 'oklch(0.5 0.02 260)',        // Gray
+  'Real Estate':  'oklch(0.72 0.16 65)',   // Amber/terracotta
+  'Stock Market': 'oklch(0.68 0.18 220)',  // Blue
+  'Government':   'oklch(0.72 0.19 165)', // Emerald
+  'Alternate':    'oklch(0.7 0.2 280)',   // Purple
+  'Liquid':       'oklch(0.7 0.15 195)',  // Cyan
+  'Gold':         'oklch(0.75 0.18 85)',  // Amber
+  'Other':        'oklch(0.5 0.02 260)',  // Gray
 };
 
 // Get color for investment
 const getInvestmentColor = (investmentName: string): string => {
   return INVESTMENT_COLORS[investmentName] || 'oklch(0.5 0.02 260)';
-};
-
-// Categorize investments into asset classes
-const categorizeInvestment = (name: string): string => {
-  const lowerName = name.toLowerCase();
-  if (lowerName.includes('equity') || lowerName.includes('shares') || lowerName.includes('stock')) {
-    return 'Equity';
-  }
-  if (lowerName.includes('fd') || lowerName.includes('epf') || lowerName.includes('nps') || lowerName.includes('fixed')) {
-    return 'Debt';
-  }
-  if (lowerName.includes('gold') || lowerName.includes('real estate') || lowerName.includes('land')) {
-    return 'Alternative';
-  }
-  if (lowerName.includes('mutual') || lowerName.includes('fund')) {
-    return 'Hybrid';
-  }
-  return 'Other';
 };
 
 export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps> = ({
@@ -98,7 +82,7 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
           value: currentValue,
           percentage: total > 0 ? (currentValue / total) * 100 : 0,
           color: getInvestmentColor(investment.name),
-          category: categorizeInvestment(investment.name)
+          category: getInvestmentAssetClass(investment.name)
         };
       })
       .filter(item => item.value > 0)
@@ -119,7 +103,7 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
       name,
       value,
       percentage: total > 0 ? (value / total) * 100 : 0,
-      color: ASSET_CLASS_COLORS[name.toLowerCase()] || 'oklch(0.5 0.02 260)'
+      color: ASSET_CLASS_COLORS[name] || 'oklch(0.5 0.02 260)'
     }));
 
     // Create chart data

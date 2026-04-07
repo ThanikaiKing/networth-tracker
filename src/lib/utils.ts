@@ -455,6 +455,26 @@ export const validateNetWorthData = (data: NetWorthEntry[]): boolean => {
   );
 };
 
+// Asset class mapping — maps exact investment names to their asset class
+export const INVESTMENT_ASSET_CLASS_MAP: Record<string, string> = {
+  'Bhive': 'Real Estate',
+  'Aston grey': 'Real Estate',
+  'Estates - Per Annum': 'Real Estate',
+  'Mutual funds': 'Stock Market',
+  'Equity': 'Stock Market',
+  'US Stocks': 'Stock Market',
+  'Walmart shares': 'Stock Market',
+  'EPF': 'Government',
+  'NPS': 'Government',
+  'BetterInvest': 'Alternate',
+  'Liquid funds': 'Liquid',
+  'Gold': 'Gold',
+};
+
+export const getInvestmentAssetClass = (name: string): string => {
+  return INVESTMENT_ASSET_CLASS_MAP[name] ?? 'Other';
+};
+
 // PROJECTION UTILITIES
 
 /**
