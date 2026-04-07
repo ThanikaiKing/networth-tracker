@@ -19,6 +19,7 @@ import { SkeletonChart } from '@/components/common/LoadingSpinner';
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.defaults.color = 'oklch(0.52 0.02 75)';
 
 // Custom plugin to display center text with responsive font sizing
 const createCenterTextPlugin = (totalAssets: number): Plugin<'doughnut'> => ({
@@ -50,12 +51,12 @@ const createCenterTextPlugin = (totalAssets: number): Plugin<'doughnut'> => ({
     ctx.textBaseline = 'middle';
     
     // Draw "Total Assets" label with responsive font size
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; // muted-foreground
+    ctx.fillStyle = 'oklch(0.52 0.02 75)'; // muted-foreground
     ctx.font = `500 ${labelFontSize}px system-ui, sans-serif`;
     ctx.fillText('Total Assets', centerX, centerY - (labelFontSize * 0.75));
     
     // Draw the amount with responsive font size
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'; // foreground
+    ctx.fillStyle = 'oklch(0.18 0.025 60)'; // foreground
     ctx.font = `700 ${valueFontSize}px system-ui, sans-serif`;
     const formattedAmount = new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -182,10 +183,10 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
       {
         data: assetCategories.map(item => item.value),
         backgroundColor: assetCategories.map(item => item.color),
-        borderColor: 'oklch(0.18 0.02 260)',
+        borderColor: 'oklch(0.997 0.003 80)',
         borderWidth: 3,
         hoverBorderWidth: 4,
-        hoverBorderColor: 'oklch(0.3 0.02 260)',
+        hoverBorderColor: 'oklch(0.97 0.005 80)',
       },
     ],
   };
@@ -201,7 +202,7 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
           usePointStyle: true,
           pointStyle: 'circle',
           padding: 20,
-          color: 'rgba(255, 255, 255, 0.7)',
+          color: 'oklch(0.52 0.02 75)',
           font: {
             size: 12,
           },
@@ -216,6 +217,7 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
                   fillStyle: (data.datasets[0].backgroundColor as string[])?.[i] || '#000000',
                   strokeStyle: (data.datasets[0].borderColor as string) || '#000000',
                   lineWidth: (typeof data.datasets[0].borderWidth === 'number' ? data.datasets[0].borderWidth : 1),
+                  fontColor: 'oklch(0.52 0.02 75)',
                   hidden: false,
                   index: i,
                 };
@@ -226,9 +228,9 @@ export const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
         },
       },
       tooltip: {
-        backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
-        titleColor: 'rgba(255, 255, 255, 0.95)',
-        bodyColor: 'rgba(255, 255, 255, 0.8)',
+        backgroundColor: 'oklch(0.18 0.025 60)',
+        titleColor: 'oklch(0.92 0.006 80)',
+        bodyColor: 'oklch(0.78 0.01 80)',
         borderColor: 'oklch(0.4 0.02 260)',
         borderWidth: 1,
         cornerRadius: 12,

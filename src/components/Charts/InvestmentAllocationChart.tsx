@@ -20,6 +20,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 // Set default device pixel ratio for crisp rendering
 ChartJS.defaults.devicePixelRatio = 2;
+ChartJS.defaults.color = 'oklch(0.52 0.02 75)';
 
 // Investment color configuration - dark theme
 const INVESTMENT_COLORS: Record<string, string> = {
@@ -133,10 +134,10 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
           {
             data: chartValues,
             backgroundColor: chartColors,
-            borderColor: 'oklch(0.18 0.02 260)',
+            borderColor: 'oklch(0.997 0.003 80)',
             borderWidth: 2,
             hoverBorderWidth: 3,
-            hoverBorderColor: 'oklch(0.3 0.02 260)',
+            hoverBorderColor: 'oklch(0.97 0.005 80)',
             hoverOffset: 8,
           },
         ],
@@ -202,7 +203,7 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
             size: 10,
             weight: 500
           },
-          color: 'rgba(255, 255, 255, 0.7)',
+          color: 'oklch(0.52 0.02 75)',
           padding: 12,
           boxWidth: 8,
           boxHeight: 8,
@@ -215,7 +216,8 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
                 return {
                   text: `${label} (${percentage.toFixed(1)}%)`,
                   fillStyle: (data.datasets[0].backgroundColor as string[])?.[index] || 'oklch(0.5 0.02 260)',
-                  strokeStyle: 'oklch(0.18 0.02 260)',
+                  strokeStyle: 'oklch(0.997 0.003 80)',
+                  fontColor: 'oklch(0.52 0.02 75)',
                   lineWidth: 2,
                   hidden: false,
                   index,
@@ -227,9 +229,9 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
         },
       },
       tooltip: {
-        backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
-        titleColor: 'rgba(255, 255, 255, 0.95)',
-        bodyColor: 'rgba(255, 255, 255, 0.8)',
+        backgroundColor: 'oklch(0.18 0.025 60)',
+        titleColor: 'oklch(0.92 0.006 80)',
+        bodyColor: 'oklch(0.78 0.01 80)',
         borderColor: 'oklch(0.4 0.02 260)',
         borderWidth: 1,
         cornerRadius: 12,
