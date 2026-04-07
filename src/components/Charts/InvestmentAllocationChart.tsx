@@ -138,7 +138,7 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
     'Stock Market': '9',
     'Alternate':    '15',
     'Gold':         '12',
-    'Government':   '8',
+    'Government':   '10',
     'Liquid':       '7',
   };
 
