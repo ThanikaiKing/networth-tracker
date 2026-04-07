@@ -133,12 +133,22 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
   }, [data]);
 
   // Expected returns per asset class (persisted in localStorage)
+  const DEFAULT_EXPECTED_RETURNS: Record<string, string> = {
+    'Real Estate':  '20',
+    'Stock Market': '9',
+    'Alternate':    '15',
+    'Gold':         '12',
+    'Government':   '8',
+    'Liquid':       '7',
+  };
+
   const [expectedReturns, setExpectedReturns] = useState<Record<string, string>>(() => {
-    if (typeof window === 'undefined') return {};
+    if (typeof window === 'undefined') return DEFAULT_EXPECTED_RETURNS;
     try {
-      return JSON.parse(localStorage.getItem('investment-expected-returns') || '{}');
+      const saved = JSON.parse(localStorage.getItem('investment-expected-returns') || '{}');
+      return { ...DEFAULT_EXPECTED_RETURNS, ...saved };
     } catch {
-      return {};
+      return DEFAULT_EXPECTED_RETURNS;
     }
   });
 
