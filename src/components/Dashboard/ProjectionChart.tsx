@@ -109,7 +109,7 @@ export const ProjectionChart: React.FC<ProjectionChartComponentProps> = ({
             pointRadius: 3,
             pointHoverRadius: 5,
             pointBackgroundColor: colors.historical,
-            pointBorderColor: 'oklch(0.18 0.02 260)',
+            pointBorderColor: 'oklch(0.997 0.003 80)',
             pointBorderWidth: 2,
             tension: 0.4,
             fill: false,
@@ -124,7 +124,7 @@ export const ProjectionChart: React.FC<ProjectionChartComponentProps> = ({
             pointRadius: 0,
             pointHoverRadius: 4,
             pointBackgroundColor: colors.conservative,
-            pointBorderColor: 'oklch(0.18 0.02 260)',
+            pointBorderColor: 'oklch(0.997 0.003 80)',
             pointBorderWidth: 1,
             tension: 0.4,
             fill: false,
@@ -139,7 +139,7 @@ export const ProjectionChart: React.FC<ProjectionChartComponentProps> = ({
             pointRadius: 0,
             pointHoverRadius: 4,
             pointBackgroundColor: colors.moderate,
-            pointBorderColor: 'oklch(0.18 0.02 260)',
+            pointBorderColor: 'oklch(0.997 0.003 80)',
             pointBorderWidth: 1,
             tension: 0.4,
             fill: false,
@@ -154,7 +154,7 @@ export const ProjectionChart: React.FC<ProjectionChartComponentProps> = ({
             pointRadius: 0,
             pointHoverRadius: 4,
             pointBackgroundColor: colors.aggressive,
-            pointBorderColor: 'oklch(0.18 0.02 260)',
+            pointBorderColor: 'oklch(0.997 0.003 80)',
             pointBorderWidth: 1,
             tension: 0.4,
             fill: false,
@@ -185,13 +185,13 @@ export const ProjectionChart: React.FC<ProjectionChartComponentProps> = ({
                 size: 11,
                 weight: 500 as const
               },
-              color: 'rgba(255, 255, 255, 0.5)'
+              color: 'oklch(0.52 0.02 75)'
             },
             grid: {
-              color: 'oklch(0.3 0.02 260 / 0.2)'
+              color: 'oklch(0.875 0.013 80)'
             },
             ticks: {
-              color: 'rgba(255, 255, 255, 0.5)',
+              color: 'oklch(0.52 0.02 75)',
               font: {
                 size: 10
               }
@@ -206,13 +206,13 @@ export const ProjectionChart: React.FC<ProjectionChartComponentProps> = ({
                 size: 11,
                 weight: 500 as const
               },
-              color: 'rgba(255, 255, 255, 0.5)'
+              color: 'oklch(0.52 0.02 75)'
             },
             grid: {
-              color: 'oklch(0.3 0.02 260 / 0.2)'
+              color: 'oklch(0.875 0.013 80)'
             },
             ticks: {
-              color: 'rgba(255, 255, 255, 0.5)',
+              color: 'oklch(0.52 0.02 75)',
               font: {
                 size: 10
               },
@@ -224,9 +224,9 @@ export const ProjectionChart: React.FC<ProjectionChartComponentProps> = ({
         },
         plugins: {
           tooltip: {
-            backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
-            titleColor: 'rgba(255, 255, 255, 0.95)',
-            bodyColor: 'rgba(255, 255, 255, 0.8)',
+            backgroundColor: 'oklch(0.18 0.025 60)',
+            titleColor: 'oklch(0.92 0.006 80)',
+            bodyColor: 'oklch(0.78 0.01 80)',
             borderColor: 'oklch(0.4 0.02 260)',
             borderWidth: 1,
             cornerRadius: 12,
@@ -253,7 +253,7 @@ export const ProjectionChart: React.FC<ProjectionChartComponentProps> = ({
             labels: {
               usePointStyle: true,
               padding: 20,
-              color: 'rgba(255, 255, 255, 0.7)',
+              color: 'oklch(0.52 0.02 75)',
               font: {
                 size: 11
               }

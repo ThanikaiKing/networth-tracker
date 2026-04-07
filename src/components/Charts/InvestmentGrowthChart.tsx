@@ -137,7 +137,7 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
       pointRadius: 3,
       pointHoverRadius: 5,
       pointBackgroundColor: investment.color,
-      pointBorderColor: 'oklch(0.18 0.02 260)',
+      pointBorderColor: 'oklch(0.997 0.003 80)',
       pointBorderWidth: 2,
       pointHoverBackgroundColor: investment.color,
       pointHoverBorderColor: 'oklch(0.25 0.02 260)',
@@ -201,16 +201,16 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
             size: 10, 
             weight: 500 
           },
-          color: 'rgba(255, 255, 255, 0.7)',
+          color: 'oklch(0.52 0.02 75)',
           padding: 15,
           boxWidth: 6,
           boxHeight: 6,
         },
       },
       tooltip: {
-        backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
-        titleColor: 'rgba(255, 255, 255, 0.95)',
-        bodyColor: 'rgba(255, 255, 255, 0.8)',
+        backgroundColor: 'oklch(0.18 0.025 60)',
+        titleColor: 'oklch(0.92 0.006 80)',
+        bodyColor: 'oklch(0.78 0.01 80)',
         borderColor: 'oklch(0.4 0.02 260)',
         borderWidth: 1,
         cornerRadius: 12,
@@ -246,14 +246,14 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
         title: {
           display: true,
           text: 'Month',
-          color: 'rgba(255, 255, 255, 0.5)',
+          color: 'oklch(0.52 0.02 75)',
           font: {
             size: 11,
             weight: 500,
           },
         },
         ticks: {
-          color: 'rgba(255, 255, 255, 0.5)',
+          color: 'oklch(0.52 0.02 75)',
           font: {
             size: 10,
           },
@@ -261,7 +261,7 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
         },
         grid: {
           display: true,
-          color: 'oklch(0.3 0.02 260 / 0.2)',
+          color: 'oklch(0.875 0.013 80)',
         },
       },
       y: {
@@ -269,14 +269,14 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
         title: {
           display: true,
           text: 'Investment Value (₹)',
-          color: 'rgba(255, 255, 255, 0.5)',
+          color: 'oklch(0.52 0.02 75)',
           font: {
             size: 11,
             weight: 500,
           },
         },
         ticks: {
-          color: 'rgba(255, 255, 255, 0.5)',
+          color: 'oklch(0.52 0.02 75)',
           font: {
             size: 10,
           },
@@ -287,7 +287,7 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
         },
         grid: {
           display: true,
-          color: 'oklch(0.3 0.02 260 / 0.2)',
+          color: 'oklch(0.875 0.013 80)',
         },
         beginAtZero: false,
       },

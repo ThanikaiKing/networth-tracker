@@ -1,14 +1,12 @@
-// Chart Grid Layout Component - Responsive grid for organizing multiple charts
-
 'use client';
 
 import React from 'react';
 import { ChartGridProps } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
-export const ChartGrid: React.FC<ChartGridProps> = ({ 
-  children, 
-  columns = 2 
+export const ChartGrid: React.FC<ChartGridProps> = ({
+  children,
+  columns = 2
 }) => {
   const gridClasses = {
     1: 'grid-cols-1',
@@ -17,16 +15,13 @@ export const ChartGrid: React.FC<ChartGridProps> = ({
   };
 
   return (
-    <div className={cn(
-      'grid gap-6',
-      gridClasses[columns]
-    )}>
+    <div className={cn('grid gap-5', gridClasses[columns])}>
       {children}
     </div>
   );
 };
 
-// Individual chart container with consistent styling
+// Individual chart container
 interface ChartContainerProps {
   children: React.ReactNode;
   className?: string;
@@ -44,21 +39,22 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
 }) => {
   return (
     <div className={cn(
-      'glass-card rounded-2xl hover-lift transition-all duration-300',
+      'chart-card hover-lift',
       fullWidth && 'col-span-full',
       className
     )}>
       {(title || subtitle) && (
-        <div className="p-6 pb-0">
+        <div className="px-6 pt-5 pb-0">
           {title && (
-            <h3 className="text-lg font-semibold text-foreground mb-1">
+            <h3
+              className="font-display text-lg font-semibold text-foreground"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
               {title}
             </h3>
           )}
           {subtitle && (
-            <p className="text-sm text-muted-foreground">
-              {subtitle}
-            </p>
+            <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
           )}
         </div>
       )}
@@ -69,7 +65,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
   );
 };
 
-// Section divider for organizing chart groups
+// Section header with editorial serif title
 interface ChartSectionProps {
   title: string;
   description?: string;
@@ -84,29 +80,25 @@ export const ChartSection: React.FC<ChartSectionProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('space-y-6', className)}>
-      <div className="relative">
-        {/* Section header with gradient underline */}
-        <div className="pb-4">
-          <h2 className="text-xl font-bold text-foreground flex items-center gap-3">
-            <div className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-accent"></div>
-            {title}
-          </h2>
-          {description && (
-            <p className="text-sm text-muted-foreground mt-1 ml-4">
-              {description}
-            </p>
-          )}
-        </div>
-        {/* Gradient line */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-primary/30 via-accent/20 to-transparent"></div>
+    <div className={cn('space-y-5', className)}>
+      <div>
+        <h2
+          className="font-display text-2xl font-semibold text-foreground"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          {title}
+        </h2>
+        {description && (
+          <p className="text-sm text-muted-foreground mt-1">{description}</p>
+        )}
+        <div className="mt-3 divider" />
       </div>
       {children}
     </div>
   );
 };
 
-// Chart toggle/switcher for mobile optimization
+// Chart view toggle
 interface ChartToggleProps {
   charts: {
     id: string;
@@ -123,27 +115,17 @@ export const ChartToggle: React.FC<ChartToggleProps> = ({
   onChartChange,
 }) => {
   return (
-    <div className="flex flex-wrap gap-2 p-4 glass rounded-xl mb-6">
-      <div className="text-sm font-medium text-muted-foreground mr-3 py-2">
-        View:
-      </div>
+    <div className="period-tab-bar mb-5">
       {charts.map((chart) => (
         <button
           key={chart.id}
           onClick={() => onChartChange(chart.id)}
           className={cn(
-            'flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-            activeChart === chart.id
-              ? 'bg-primary/20 text-primary border border-primary/30 shadow-lg shadow-primary/10'
-              : 'bg-secondary/50 text-muted-foreground border border-transparent hover:bg-secondary hover:text-foreground'
+            'period-tab flex items-center gap-1.5',
+            activeChart === chart.id && 'active'
           )}
         >
-          {chart.icon && (
-            <span className="w-4 h-4">
-              {chart.icon}
-            </span>
-          )}
+          {chart.icon && <span className="w-3.5 h-3.5">{chart.icon}</span>}
           <span>{chart.name}</span>
         </button>
       ))}
@@ -151,7 +133,7 @@ export const ChartToggle: React.FC<ChartToggleProps> = ({
   );
 };
 
-// Quick stats bar for chart insights
+// Quick stats bar
 interface QuickStatsProps {
   stats: {
     label: string;
@@ -162,54 +144,23 @@ interface QuickStatsProps {
   className?: string;
 }
 
-export const QuickStats: React.FC<QuickStatsProps> = ({ 
-  stats, 
-  className 
-}) => {
-  const getTrendIcon = (trend?: 'up' | 'down' | 'neutral') => {
-    switch (trend) {
-      case 'up':
-        return (
-          <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-          </svg>
-        );
-      case 'down':
-        return (
-          <svg className="w-4 h-4 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        );
-      default:
-        return (
-          <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
-          </svg>
-        );
-    }
+export const QuickStats: React.FC<QuickStatsProps> = ({ stats, className }) => {
+  const getTrendArrow = (trend?: 'up' | 'down' | 'neutral') => {
+    if (trend === 'up') return <span className="text-primary">↑</span>;
+    if (trend === 'down') return <span className="text-destructive">↓</span>;
+    return null;
   };
 
   return (
-    <div className={cn('grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6', className)}>
+    <div className={cn('grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5', className)}>
       {stats.map((stat, index) => (
-        <div key={index} className="glass p-4 rounded-xl hover-lift transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-xs text-muted-foreground/70 uppercase tracking-wider font-medium">
-                {stat.label}
-              </div>
-              <div className={cn(
-                'text-lg font-bold mt-1 tabular-nums',
-                stat.color || 'text-foreground'
-              )}>
-                {stat.value}
-              </div>
-            </div>
-            {stat.trend && (
-              <div className="flex-shrink-0">
-                {getTrendIcon(stat.trend)}
-              </div>
-            )}
+        <div key={index} className="glass p-3.5 rounded hover-lift">
+          <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1">
+            {stat.label}
+          </div>
+          <div className={cn('text-base font-bold tabular-nums flex items-center gap-1', stat.color || 'text-foreground')}>
+            {stat.value}
+            {getTrendArrow(stat.trend)}
           </div>
         </div>
       ))}
@@ -217,27 +168,23 @@ export const QuickStats: React.FC<QuickStatsProps> = ({
   );
 };
 
-// Loading state for chart grids
+// Loading skeleton for chart grids
 export const ChartGridSkeleton: React.FC<{ count?: number }> = ({ count = 4 }) => {
-  // Static heights for skeleton bars
   const barHeights = ['60%', '45%', '75%', '40%', '55%', '80%'];
-  
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="glass-card rounded-2xl p-6">
+        <div key={i} className="chart-card p-6">
           <div className="animate-pulse">
-            <div className="h-6 bg-muted rounded-lg w-1/3 mb-2"></div>
-            <div className="h-4 bg-muted/50 rounded-lg w-1/2 mb-6"></div>
-            <div className="h-64 bg-muted/30 rounded-xl flex items-end justify-center space-x-2 p-4">
+            <div className="h-5 bg-muted rounded w-1/3 mb-1.5" />
+            <div className="h-3.5 bg-muted/60 rounded w-1/2 mb-5" />
+            <div className="h-56 bg-muted/20 rounded flex items-end justify-center gap-2 p-4 border border-muted/30">
               {barHeights.map((height, j) => (
                 <div
                   key={j}
-                  className="bg-muted/50 rounded-t animate-shimmer"
-                  style={{
-                    height,
-                    width: '12%',
-                  }}
+                  className="bg-muted/40 rounded-t animate-shimmer"
+                  style={{ height, width: '12%' }}
                 />
               ))}
             </div>

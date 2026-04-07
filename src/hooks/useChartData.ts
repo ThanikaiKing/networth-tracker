@@ -62,29 +62,29 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
         {
           label: 'Net Worth',
           data: values,
-          borderColor: 'oklch(0.72 0.19 165)', // Primary emerald
+          borderColor: 'oklch(0.38 0.095 152)', // Forest green
           backgroundColor: (context: { chart: { ctx: CanvasRenderingContext2D; chartArea?: { top: number; bottom: number } } }) => {
             const ctx = context.chart.ctx;
             const chartArea = context.chart.chartArea;
-            if (!chartArea) return 'oklch(0.72 0.19 165 / 0.1)';
-            
+            if (!chartArea) return 'oklch(0.38 0.095 152 / 0.08)';
+
             const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            gradient.addColorStop(0, 'oklch(0.72 0.19 165 / 0.3)');
-            gradient.addColorStop(0.5, 'oklch(0.72 0.19 165 / 0.1)');
-            gradient.addColorStop(1, 'oklch(0.72 0.19 165 / 0)');
+            gradient.addColorStop(0, 'oklch(0.38 0.095 152 / 0.18)');
+            gradient.addColorStop(0.6, 'oklch(0.38 0.095 152 / 0.05)');
+            gradient.addColorStop(1, 'oklch(0.38 0.095 152 / 0)');
             return gradient;
           },
-          borderWidth: 2.5,
+          borderWidth: 2,
           fill: true,
           tension: 0.4,
-          pointBackgroundColor: 'oklch(0.72 0.19 165)',
-          pointBorderColor: 'oklch(0.18 0.02 260)',
+          pointBackgroundColor: 'oklch(0.38 0.095 152)',
+          pointBorderColor: 'oklch(0.997 0.003 80)',
           pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          pointHoverBackgroundColor: 'oklch(0.75 0.2 165)',
-          pointHoverBorderColor: 'oklch(0.25 0.02 260)',
-          pointHoverBorderWidth: 3,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: 'oklch(0.32 0.09 152)',
+          pointHoverBorderColor: 'oklch(0.997 0.003 80)',
+          pointHoverBorderWidth: 2,
         },
       ],
     },
@@ -94,16 +94,16 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
       devicePixelRatio: 2,
       plugins: {
         legend: {
-          display: false, // Hide legend since we only have one dataset
+          display: false,
         },
         tooltip: {
-          backgroundColor: 'oklch(0.16 0.02 260 / 0.95)',
-          titleColor: 'rgba(255, 255, 255, 0.95)',
-          bodyColor: 'rgba(255, 255, 255, 0.85)',
-          borderColor: 'oklch(0.72 0.19 165 / 0.5)',
+          backgroundColor: 'oklch(0.18 0.025 60)',
+          titleColor: 'oklch(0.92 0.006 80)',
+          bodyColor: 'oklch(0.78 0.01 80)',
+          borderColor: 'oklch(0.38 0.095 152 / 0.4)',
           borderWidth: 1,
-          cornerRadius: 12,
-          padding: 12,
+          cornerRadius: 6,
+          padding: 10,
           displayColors: false,
           callbacks: {
             title: function(context: Array<{ label?: string }>) {
@@ -126,22 +126,17 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
           title: {
             display: true,
             text: 'Month',
-            color: 'rgba(255, 255, 255, 0.5)',
-            font: {
-              size: 11,
-              weight: 500,
-            },
+            color: 'oklch(0.62 0.018 75)',
+            font: { size: 11, weight: 500 },
           },
           ticks: {
-            color: 'rgba(255, 255, 255, 0.5)',
-            font: {
-              size: 10,
-            },
+            color: 'oklch(0.52 0.02 75)',
+            font: { size: 10 },
             maxTicksLimit: 6,
           },
           grid: {
             display: true,
-            color: 'oklch(0.3 0.02 260 / 0.2)',
+            color: 'oklch(0.875 0.013 80)',
           },
         },
         y: {
@@ -149,17 +144,12 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
           title: {
             display: true,
             text: 'Net Worth (₹)',
-            color: 'rgba(255, 255, 255, 0.5)',
-            font: {
-              size: 11,
-              weight: 500,
-            },
+            color: 'oklch(0.62 0.018 75)',
+            font: { size: 11, weight: 500 },
           },
           ticks: {
-            color: 'rgba(255, 255, 255, 0.5)',
-            font: {
-              size: 10,
-            },
+            color: 'oklch(0.52 0.02 75)',
+            font: { size: 10 },
             callback: function(value: string | number) {
               // Format large numbers with K/M/Cr suffixes
               const num = typeof value === 'number' ? value : parseFloat(value);
@@ -175,7 +165,7 @@ export const useChartData = (data: NetWorthEntry[]): UseChartDataReturn => {
           },
           grid: {
             display: true,
-            color: 'oklch(0.3 0.02 260 / 0.2)',
+            color: 'oklch(0.875 0.013 80)',
           },
         },
       },
