@@ -103,7 +103,7 @@ export const ProjectionControls: React.FC<ProjectionControlsProps> = ({
       </div>
 
       {/* Info bar */}
-      <div className="mt-4 pt-4 border-t border-border/30 flex items-center justify-between text-xs text-muted-foreground/60">
+      <div className="mt-4 pt-4 border-t border-border/30 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground/60">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
           <span>Projections update in real-time</span>

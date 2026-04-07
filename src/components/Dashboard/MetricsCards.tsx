@@ -50,7 +50,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
         {title}
       </p>
 
-      <p className="text-[2.1rem] font-bold leading-none text-foreground tabular-nums" style={{ fontFamily: 'var(--font-mono)' }}>
+      <p className="text-[1.7rem] sm:text-[2.1rem] font-bold leading-none text-foreground tabular-nums" style={{ fontFamily: 'var(--font-mono)' }}>
         {value}
       </p>
 

@@ -161,7 +161,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
                 className="mt-8 pt-4 border-t border-border opacity-0 animate-fade-up"
                 style={{ animationDelay: '0.61s', animationFillMode: 'forwards' }}
               >
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary animate-dot-pulse" />

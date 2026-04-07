@@ -69,7 +69,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
   return (
     <div className="chart-card p-6 hover-lift">
       {/* Chart Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
         <div>
           <h2
             className="font-display text-xl font-semibold text-foreground"
@@ -82,7 +82,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-3 text-xs">
+        <div className="flex items-center gap-3 text-xs flex-shrink-0">
           <div className="flex items-center gap-1.5 px-2.5 py-1 glass rounded">
             <div className="w-2 h-2 rounded-full bg-chart-1" />
             <span className="text-muted-foreground">Net Worth</span>

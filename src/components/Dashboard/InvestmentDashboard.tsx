@@ -7,7 +7,7 @@ import { InvestmentDashboardProps } from '@/lib/types';
 import { InvestmentGrowthChart } from '@/components/Charts/InvestmentGrowthChart';
 import { InvestmentAllocationChart } from '@/components/Charts/InvestmentAllocationChart';
 import { InvestmentPerformanceCards } from '@/components/Charts/InvestmentPerformanceCards';
-import { PeriodSelector } from '@/components/Dashboard/PeriodSelector';
+import { ResponsivePeriodSelector } from '@/components/Dashboard/PeriodSelector';
 import { calculateInvestmentAnalytics } from '@/lib/analytics';
 import { formatCurrency } from '@/lib/utils';
 
@@ -107,7 +107,7 @@ export const InvestmentDashboard: React.FC<InvestmentDashboardProps> = ({
         
         {/* Period Selector */}
         <div className="mt-4 md:mt-0">
-          <PeriodSelector
+          <ResponsivePeriodSelector
             selectedPeriod={selectedPeriod}
             onPeriodChange={onPeriodChange}
             availablePeriods={['all', '6months', '3months', '1month']}
