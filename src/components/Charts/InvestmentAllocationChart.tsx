@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -131,6 +131,36 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
       totalInvestments: total,
     };
   }, [data]);
+
+  // Expected returns per asset class (persisted in localStorage)
+  const [expectedReturns, setExpectedReturns] = useState<Record<string, string>>(() => {
+    if (typeof window === 'undefined') return {};
+    try {
+      return JSON.parse(localStorage.getItem('investment-expected-returns') || '{}');
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('investment-expected-returns', JSON.stringify(expectedReturns));
+  }, [expectedReturns]);
+
+  const weightedReturn = useMemo(() => {
+    if (totalInvestments === 0) return null;
+    let sum = 0;
+    let coveredWeight = 0;
+    assetClassBreakdown.forEach(ac => {
+      const ret = parseFloat(expectedReturns[ac.name] ?? '');
+      if (!isNaN(ret)) {
+        const weight = ac.value / totalInvestments;
+        sum += weight * ret;
+        coveredWeight += weight;
+      }
+    });
+    if (coveredWeight === 0) return null;
+    return { value: sum, coveredWeight };
+  }, [assetClassBreakdown, expectedReturns, totalInvestments]);
 
   if (isLoading) {
     return <SkeletonChart className="h-96" />;
@@ -305,31 +335,52 @@ export const InvestmentAllocationChart: React.FC<InvestmentAllocationChartProps>
         </div>
       </div>
 
-      {/* Asset Class Summary */}
+      {/* Asset Class Distribution with expected returns */}
       <div className="mt-6 p-4 glass rounded-xl border border-chart-2/20">
-        <div className="flex items-start space-x-3">
-          <div className="p-1.5 rounded-lg bg-chart-2/10">
-            <svg className="w-4 h-4 text-chart-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <div className="text-sm font-medium text-chart-2 mb-3">Asset Class Distribution</div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {assetClassBreakdown.map((assetClass, index) => (
-                <div key={index} className="text-center p-2 glass rounded-lg">
-                  <div className="text-xs text-muted-foreground/70">{assetClass.name}</div>
-                  <div className="text-sm font-bold text-foreground tabular-nums">
-                    {assetClass.percentage.toFixed(1)}%
-                  </div>
-                  <div className="text-xs text-muted-foreground/50 tabular-nums">
-                    {formatCurrencyShort(assetClass.value)}
-                  </div>
-                </div>
-              ))}
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-sm font-medium text-chart-2">Asset Class Distribution</div>
+          {weightedReturn !== null && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground/70">Weighted Return</span>
+              <span className="text-lg font-bold text-primary tabular-nums">
+                {weightedReturn.value.toFixed(1)}%
+              </span>
+              {weightedReturn.coveredWeight < 0.999 && (
+                <span className="text-xs text-muted-foreground/50">
+                  ({(weightedReturn.coveredWeight * 100).toFixed(0)}% covered)
+                </span>
+              )}
             </div>
-          </div>
+          )}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          {assetClassBreakdown.map((assetClass, index) => (
+            <div key={index} className="p-3 glass rounded-lg space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: assetClass.color }} />
+                <div className="text-xs font-medium text-foreground truncate">{assetClass.name}</div>
+              </div>
+              <div className="text-sm font-bold text-foreground tabular-nums">
+                {assetClass.percentage.toFixed(1)}%
+              </div>
+              <div className="text-xs text-muted-foreground/50 tabular-nums">
+                {formatCurrencyShort(assetClass.value)}
+              </div>
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  placeholder="—"
+                  value={expectedReturns[assetClass.name] ?? ''}
+                  onChange={e => setExpectedReturns(prev => ({ ...prev, [assetClass.name]: e.target.value }))}
+                  className="w-full text-xs text-right bg-transparent border border-border/40 rounded px-1.5 py-0.5 text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/60 tabular-nums"
+                />
+                <span className="text-xs text-muted-foreground/50 flex-shrink-0">%</span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
