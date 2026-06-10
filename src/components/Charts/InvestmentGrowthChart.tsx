@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,7 +16,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { InvestmentGrowthChartProps, InvestmentChartData, TimePeriod, NetWorthEntry } from '@/lib/types';
-import { formatCurrency, formatCurrencyShort } from '@/lib/utils';
+import { formatCurrency, formatCurrencyShort, cn } from '@/lib/utils';
 import { SkeletonChart } from '@/components/common/LoadingSpinner';
 
 // Register Chart.js components
@@ -74,6 +74,9 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
   selectedInvestments = [],
   isLoading,
 }) => {
+  // View mode toggle: summed total vs individual investment lines
+  const [viewMode, setViewMode] = useState<'total' | 'individual'>('total');
+
   // Filter data by selected period (move before early returns)
   const filteredData = filterDataByPeriod(data || [], selectedPeriod);
 
@@ -85,9 +88,35 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
     // Extract dates for x-axis
     const labels = filteredData.map(entry => entry.date);
 
+    if (viewMode === 'total') {
+      const totalColor = 'oklch(0.45 0.12 155)';
+      const totalData = filteredData.map(entry => entry.investments.subtotal);
+
+      return {
+        labels,
+        datasets: [{
+          label: 'Total Investments',
+          data: totalData,
+          borderColor: totalColor,
+          backgroundColor: totalColor.replace(')', ' / 0.15)'),
+          fill: false,
+          tension: 0.4,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          pointBackgroundColor: totalColor,
+          pointBorderColor: 'oklch(0.997 0.003 80)',
+          pointBorderWidth: 2,
+          pointHoverBackgroundColor: totalColor,
+          pointHoverBorderColor: 'oklch(0.25 0.02 260)',
+          pointHoverBorderWidth: 2,
+          borderWidth: 2,
+        }],
+      };
+    }
+
     // Extract investment accounts from the data
     const investmentAccounts: InvestmentChartData[] = [];
-    
+
     // Collect all unique investment names
     const allInvestmentNames = new Set<string>();
     filteredData.forEach(entry => {
@@ -104,7 +133,7 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
       }
 
       const investmentData: number[] = [];
-      
+
       filteredData.forEach(entry => {
         const account = entry.investments.accounts.find((acc: { name: string; values: number[] }) => acc.name === investmentName);
         // Use the latest value for each month, or 0 if not found
@@ -146,7 +175,35 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
     }));
 
     return { labels, datasets };
-  }, [filteredData, selectedInvestments, data]);
+  }, [filteredData, selectedInvestments, data, viewMode]);
+
+  // Active investment count, independent of view mode
+  const activeInvestmentCount = useMemo(() => {
+    if (!filteredData.length) return 0;
+
+    const allInvestmentNames = new Set<string>();
+    filteredData.forEach(entry => {
+      entry.investments.accounts.forEach((account: { name: string; values: number[] }) => {
+        allInvestmentNames.add(account.name);
+      });
+    });
+
+    let count = 0;
+    Array.from(allInvestmentNames).forEach(investmentName => {
+      if (selectedInvestments.length > 0 && !selectedInvestments.includes(investmentName)) {
+        return;
+      }
+
+      const hasNonZeroValue = filteredData.some(entry => {
+        const account = entry.investments.accounts.find((acc: { name: string; values: number[] }) => acc.name === investmentName);
+        return account ? (account.values[account.values.length - 1] || 0) > 0 : false;
+      });
+
+      if (hasNonZeroValue) count++;
+    });
+
+    return count;
+  }, [filteredData, selectedInvestments]);
 
   if (isLoading) {
     return <SkeletonChart className="h-96" />;
@@ -324,8 +381,30 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
             Investment Growth
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Individual investment performance over time
+            {viewMode === 'total'
+              ? 'Total portfolio value over time'
+              : 'Individual investment performance over time'}
           </p>
+          <div className="period-tab-bar mt-3">
+            <button
+              onClick={() => setViewMode('total')}
+              className={cn(
+                'period-tab focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset',
+                viewMode === 'total' && 'active'
+              )}
+            >
+              Total
+            </button>
+            <button
+              onClick={() => setViewMode('individual')}
+              className={cn(
+                'period-tab focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset',
+                viewMode === 'individual' && 'active'
+              )}
+            >
+              Individual
+            </button>
+          </div>
         </div>
 
         {/* Investment Summary */}
@@ -370,7 +449,7 @@ export const InvestmentGrowthChart: React.FC<InvestmentGrowthChartProps> = ({
               <div className="text-sm font-medium text-chart-2">Active Investments</div>
             </div>
             <div className="text-2xl font-bold text-foreground mt-2 tabular-nums">
-              {chartData.datasets.length}
+              {activeInvestmentCount}
             </div>
             <div className="text-xs text-muted-foreground/70 mt-1">
               Different investment types
