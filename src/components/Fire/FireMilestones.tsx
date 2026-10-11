@@ -58,11 +58,10 @@ export const FireMilestones: React.FC<FireMilestonesProps> = ({ calculation }) =
           return (
             <div
               key={m.type}
-              className={`rounded-2xl p-5 border flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${
-                isFull
-                  ? 'bg-gradient-to-b from-primary/10 to-transparent border-primary/30 shadow-xs'
-                  : 'bg-card border-border/80'
-              }`}
+              className={`rounded-2xl p-5 border flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${isFull
+                ? 'bg-gradient-to-b from-primary/10 to-transparent border-primary/30 shadow-xs'
+                : 'bg-card border-border/80'
+                }`}
             >
               <div>
                 {/* Header Icon + Badge */}
@@ -71,11 +70,10 @@ export const FireMilestones: React.FC<FireMilestonesProps> = ({ calculation }) =
                     {getTierIcon(m.type)}
                   </span>
                   <span
-                    className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${
-                      isFull
-                        ? 'bg-primary/20 text-primary border border-primary/30'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
+                    className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${isFull
+                      ? 'bg-primary/20 text-primary border border-primary/30'
+                      : 'bg-muted text-muted-foreground'
+                      }`}
                   >
                     {isFull && <CheckCircle2 className="h-3 w-3" />}
                     {m.badgeLabel}
@@ -116,9 +114,8 @@ export const FireMilestones: React.FC<FireMilestonesProps> = ({ calculation }) =
                 </div>
                 <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                   <div
-                    className={`h-full transition-all duration-500 rounded-full ${
-                      isFull ? 'bg-primary' : 'bg-chart-2'
-                    }`}
+                    className={`h-full transition-all duration-500 rounded-full ${isFull ? 'bg-primary' : 'bg-chart-2'
+                      }`}
                     style={{ width: `${Math.min(100, m.progressPercentage)}%` }}
                   />
                 </div>
