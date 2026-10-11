@@ -252,10 +252,10 @@ export const WifeReassuranceSection: React.FC<WifeReassuranceProps> = ({
                   <Plane className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-semibold text-sm text-foreground">
-                      &ldquo;Can we still go to Europe or Japan?&rdquo;
+                      &ldquo;Can we still go to Maldives or Japan?&rdquo;
                     </h5>
                     <p className="text-xs sm:text-sm text-muted-foreground mt-1 leading-relaxed">
-                      <strong>Answer:</strong> Yes! In fact, we can travel on Tuesday afternoons when flights are 40% cheaper and hotels aren&apos;t crowded, because we don&apos;t have to beg an HR department for 5 days of vacation leave.
+                      <strong>Answer:</strong> Yes! In fact, we can fly to Maldives on Tuesday afternoons when flights are 40% cheaper and overwater villas aren&apos;t crowded, because we don&apos;t have to beg an HR department for 5 days of vacation leave.
                     </p>
                   </div>
                 </div>
