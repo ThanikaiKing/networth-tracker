@@ -2,10 +2,20 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FireCalculationResult } from '@/lib/fireTypes';
 import { formatCurrency, formatCurrencyShort } from '@/lib/utils';
-import { Sparkles, ShieldCheck, TrendingUp, Infinity as InfinityIcon, Award, DollarSign } from 'lucide-react';
+import {
+  Sparkles,
+  ShieldCheck,
+  TrendingUp,
+  Infinity as InfinityIcon,
+  Award,
+  DollarSign,
+  Eye,
+  EyeOff,
+  RotateCw,
+} from 'lucide-react';
 
 interface PostFireHeroProps {
   calculation: FireCalculationResult;
@@ -29,6 +39,102 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
   } = postFireAnalytics;
 
   const fundingPercent = Math.round(freedomRatio * 100);
+
+  // Hidden value & dramatic reveal animation state
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animPhase, setAnimPhase] = useState<'idle' | 'speeding' | 'decelerating' | 'landing'>('idle');
+  const [justLanded, setJustLanded] = useState(false);
+  const [displayAllowance, setDisplayAllowance] = useState(0);
+  const animRef = useRef<number | null>(null);
+
+  // 3-Phase dramatic speeding curve:
+  // 1. Rapid acceleration / high-speed text rush (0 -> 82%)
+  // 2. Visible deceleration (82% -> 96%)
+  // 3. Slow, dramatic countdown landing (96% -> 100%)
+  const getDramaticSpeedProgress = (p: number): number => {
+    if (p <= 0) return 0;
+    if (p >= 1) return 1;
+
+    if (p < 0.42) {
+      // High-speed rush phase
+      const sub = p / 0.42;
+      return 0.82 * Math.sin((sub * Math.PI) / 2);
+    } else if (p < 0.72) {
+      // Deceleration braking phase
+      const sub = (p - 0.42) / 0.3;
+      return 0.82 + (0.962 - 0.82) * Math.sin((sub * Math.PI) / 2);
+    } else {
+      // Dramatic countdown landing phase: ticking into final number
+      const sub = (p - 0.72) / 0.28;
+      return 0.962 + (1 - 0.962) * (1 - Math.pow(1 - sub, 2.5));
+    }
+  };
+
+  const startRevealAnimation = () => {
+    setIsRevealed(true);
+    setIsAnimating(true);
+    setJustLanded(false);
+    setAnimPhase('speeding');
+    setDisplayAllowance(0);
+
+    const target = guiltFreeMonthlyAllowance;
+    const duration = 2600; // 2.6 seconds dramatic reveal
+    const startTime = performance.now();
+
+    if (animRef.current) {
+      cancelAnimationFrame(animRef.current);
+    }
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(1, elapsed / duration);
+
+      if (progress < 0.42) {
+        setAnimPhase('speeding');
+      } else if (progress < 0.72) {
+        setAnimPhase('decelerating');
+      } else {
+        setAnimPhase('landing');
+      }
+
+      const easeProgress = getDramaticSpeedProgress(progress);
+      const currentVal = Math.round(target * easeProgress);
+
+      setDisplayAllowance(currentVal);
+
+      if (progress < 1) {
+        animRef.current = requestAnimationFrame(animate);
+      } else {
+        setDisplayAllowance(target);
+        setIsAnimating(false);
+        setAnimPhase('idle');
+        setJustLanded(true);
+        animRef.current = null;
+
+        // Reset justLanded sparkle after 2 seconds
+        setTimeout(() => setJustLanded(false), 2000);
+      }
+    };
+
+    animRef.current = requestAnimationFrame(animate);
+  };
+
+  // Cleanup animation frame
+  useEffect(() => {
+    return () => {
+      if (animRef.current) {
+        cancelAnimationFrame(animRef.current);
+      }
+    };
+  }, []);
+
+  // Update smoothly if target changes while already revealed and not animating
+  useEffect(() => {
+    if (isRevealed && !isAnimating) {
+      setDisplayAllowance(guiltFreeMonthlyAllowance);
+    }
+  }, [guiltFreeMonthlyAllowance, isRevealed, isAnimating]);
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card to-secondary/30 p-6 sm:p-8 md:p-10 shadow-sm">
@@ -106,18 +212,117 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
 
       {/* 4 Core Freedom Metric Cards */}
       <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        {/* Metric 1: Guilt-Free Monthly Allowance */}
-        <div className="glass-card rounded-2xl p-5 hover-lift relative overflow-hidden border-t-2 border-t-primary/70">
-          <div className="flex items-center justify-between text-muted-foreground text-xs font-medium uppercase tracking-wider mb-2">
-            <span>Monthly Safe Allowance</span>
-            <DollarSign className="h-4 w-4 text-primary" />
+        {/* Metric 1: Guilt-Free Monthly Allowance with Dramatic Reveal Animation */}
+        <div className="glass-card rounded-2xl p-5 hover-lift relative overflow-hidden border-t-2 border-t-primary/70 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between text-muted-foreground text-xs font-medium uppercase tracking-wider mb-2">
+              <span>Monthly Safe Allowance</span>
+              <div className="flex items-center gap-1.5">
+                {isRevealed && !isAnimating && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setIsRevealed(false);
+                        setDisplayAllowance(0);
+                      }}
+                      title="Hide allowance"
+                      className="text-muted-foreground/70 hover:text-foreground transition-colors p-1 rounded hover:bg-muted cursor-pointer"
+                    >
+                      <EyeOff className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={startRevealAnimation}
+                      title="Replay dramatic reveal"
+                      className="text-muted-foreground/70 hover:text-foreground transition-colors p-1 rounded hover:bg-muted cursor-pointer"
+                    >
+                      <RotateCw className="h-3.5 w-3.5" />
+                    </button>
+                  </>
+                )}
+                <DollarSign className="h-4 w-4 text-primary" />
+              </div>
+            </div>
+
+            {!isRevealed ? (
+              <div className="my-2 py-1 flex items-center justify-between gap-2">
+                <span className="text-xl sm:text-2xl font-bold font-mono tracking-widest text-muted-foreground/40 select-none blur-[2px]">
+                  ₹ • •,• • •
+                </span>
+                <button
+                  onClick={startRevealAnimation}
+                  className="group relative inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all shadow-sm active:scale-95 cursor-pointer"
+                >
+                  <Eye className="h-3.5 w-3.5 group-hover:scale-110 transition-transform" />
+                  <span>Reveal Value</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-baseline gap-2">
+                <div
+                  className={`text-2xl sm:text-3xl font-bold font-mono tracking-tight transition-all duration-75 select-none ${
+                    animPhase === 'speeding'
+                      ? 'text-primary scale-105 tracking-wider drop-shadow-[0_0_16px_rgba(58,154,92,0.45)]'
+                      : animPhase === 'decelerating'
+                      ? 'text-primary scale-102 drop-shadow-[0_0_10px_rgba(58,154,92,0.3)]'
+                      : animPhase === 'landing'
+                      ? 'text-primary font-black scale-105'
+                      : justLanded
+                      ? 'text-foreground scale-102 transition-transform duration-300'
+                      : 'text-foreground'
+                  }`}
+                  style={{
+                    filter: animPhase === 'speeding' ? 'blur(0.4px)' : 'none',
+                  }}
+                >
+                  {formatCurrency(displayAllowance)}
+                </div>
+                {isAnimating && (
+                  <span
+                    className={`text-xs font-mono font-bold ${
+                      animPhase === 'speeding'
+                        ? 'text-accent animate-pulse'
+                        : animPhase === 'decelerating'
+                        ? 'text-amber-500'
+                        : 'text-primary animate-bounce'
+                    }`}
+                  >
+                    {animPhase === 'speeding' ? '⚡' : animPhase === 'decelerating' ? '⏳' : '🎯'}
+                  </span>
+                )}
+                {justLanded && (
+                  <span className="text-xs font-mono text-primary font-bold animate-ping">
+                    ✨
+                  </span>
+                )}
+              </div>
+            )}
           </div>
-          <div className="text-2xl sm:text-3xl font-bold font-mono text-foreground tracking-tight">
-            {formatCurrency(guiltFreeMonthlyAllowance)}
-          </div>
-          <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary inline-block" />
-            Guilt-free spending at {parameters.safeWithdrawalRate}% SWR
+
+          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
+            <span
+              className={`h-1.5 w-1.5 rounded-full inline-block ${
+                animPhase === 'speeding'
+                  ? 'bg-accent animate-ping'
+                  : animPhase === 'decelerating'
+                  ? 'bg-amber-500 animate-pulse'
+                  : animPhase === 'landing'
+                  ? 'bg-primary animate-ping'
+                  : isRevealed
+                  ? 'bg-primary'
+                  : 'bg-muted-foreground/40'
+              }`}
+            />
+            {animPhase === 'speeding'
+              ? 'Speeding up... calculating cash flow...'
+              : animPhase === 'decelerating'
+              ? 'Decelerating towards target...'
+              : animPhase === 'landing'
+              ? 'Landing at exact monthly allowance...'
+              : justLanded
+              ? 'Monthly allowance locked in!'
+              : isRevealed
+              ? `Guilt-free spending at ${parameters.safeWithdrawalRate}% SWR`
+              : 'Click to reveal monthly safe allowance'}
           </p>
         </div>
 
