@@ -387,12 +387,17 @@ export const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
-// Format currency in short format (e.g., ₹1.2L, ₹5.3Cr)
+// Format currency in short format (e.g., ₹1.2L, ₹1.17Cr)
 export const formatCurrencyShort = (amount: number): string => {
   if (amount >= 10000000) { // 1 crore
-    return `₹${(amount / 10000000).toFixed(1)}Cr`;
+    const cr = amount / 10000000;
+    // Format up to 2 decimal places so figures like 1.17 Cr are not rounded off to 1.2 Cr
+    const formatted = cr % 1 === 0 ? cr.toFixed(0) : cr.toFixed(2).replace(/\.?0+$/, '');
+    return `₹${formatted}Cr`;
   } else if (amount >= 100000) { // 1 lakh
-    return `₹${(amount / 100000).toFixed(1)}L`;
+    const l = amount / 100000;
+    const formatted = l % 1 === 0 ? l.toFixed(0) : l.toFixed(1).replace(/\.?0+$/, '');
+    return `₹${formatted}L`;
   } else if (amount >= 1000) { // 1 thousand
     return `₹${(amount / 1000).toFixed(0)}K`;
   }

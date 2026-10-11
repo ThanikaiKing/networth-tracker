@@ -94,7 +94,10 @@ export const FireMilestones: React.FC<FireMilestonesProps> = ({ calculation }) =
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium block">
                     Target Corpus
                   </span>
-                  <div className="text-xl font-bold font-mono text-foreground mt-0.5">
+                  <div
+                    className="text-xl font-bold font-mono text-foreground mt-0.5"
+                    title={formatCurrency(m.targetCorpus)}
+                  >
                     {formatCurrencyShort(m.targetCorpus)}
                   </div>
                   <span className="text-[11px] text-muted-foreground block mt-0.5">
