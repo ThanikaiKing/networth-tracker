@@ -79,7 +79,7 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
     setDisplayAllowance(0);
 
     const target = guiltFreeMonthlyAllowance;
-    const duration = 3400; // 3.4 seconds dramatic reveal with extended slow landing
+    const duration = 8400; // 3.4 seconds dramatic reveal with extended slow landing
     const startTime = performance.now();
 
     if (animRef.current) {
@@ -174,21 +174,19 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
         <div className="flex items-center gap-2 self-start md:self-auto bg-muted/50 p-1 rounded-xl border border-border">
           <button
             onClick={() => onSwitchMode && isAccumulationMode && onSwitchMode()}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              !isAccumulationMode
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${!isAccumulationMode
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+              }`}
           >
             Freedom Celebration
           </button>
           <button
             onClick={() => onSwitchMode && !isAccumulationMode && onSwitchMode()}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              isAccumulationMode
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${isAccumulationMode
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+              }`}
           >
             Horizon Trajectory
           </button>
@@ -259,17 +257,16 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
             ) : (
               <div className="flex items-baseline gap-2">
                 <div
-                  className={`text-2xl sm:text-3xl font-bold font-mono tracking-tight transition-all duration-75 select-none ${
-                    animPhase === 'speeding'
-                      ? 'text-primary scale-105 tracking-wider drop-shadow-[0_0_16px_rgba(58,154,92,0.45)]'
-                      : animPhase === 'decelerating'
+                  className={`text-2xl sm:text-3xl font-bold font-mono tracking-tight transition-all duration-75 select-none ${animPhase === 'speeding'
+                    ? 'text-primary scale-105 tracking-wider drop-shadow-[0_0_16px_rgba(58,154,92,0.45)]'
+                    : animPhase === 'decelerating'
                       ? 'text-primary scale-102 drop-shadow-[0_0_10px_rgba(58,154,92,0.3)]'
                       : animPhase === 'landing'
-                      ? 'text-primary font-black scale-105'
-                      : justLanded
-                      ? 'text-foreground scale-102 transition-transform duration-300'
-                      : 'text-foreground'
-                  }`}
+                        ? 'text-primary font-black scale-105'
+                        : justLanded
+                          ? 'text-foreground scale-102 transition-transform duration-300'
+                          : 'text-foreground'
+                    }`}
                   style={{
                     filter: animPhase === 'speeding' ? 'blur(0.4px)' : 'none',
                   }}
@@ -278,13 +275,12 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
                 </div>
                 {isAnimating && (
                   <span
-                    className={`text-xs font-mono font-bold ${
-                      animPhase === 'speeding'
-                        ? 'text-accent animate-pulse'
-                        : animPhase === 'decelerating'
+                    className={`text-xs font-mono font-bold ${animPhase === 'speeding'
+                      ? 'text-accent animate-pulse'
+                      : animPhase === 'decelerating'
                         ? 'text-amber-500'
                         : 'text-primary animate-bounce'
-                    }`}
+                      }`}
                   >
                     {animPhase === 'speeding' ? '⚡' : animPhase === 'decelerating' ? '⏳' : '🎯'}
                   </span>
@@ -300,29 +296,28 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
 
           <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
             <span
-              className={`h-1.5 w-1.5 rounded-full inline-block ${
-                animPhase === 'speeding'
-                  ? 'bg-accent animate-ping'
-                  : animPhase === 'decelerating'
+              className={`h-1.5 w-1.5 rounded-full inline-block ${animPhase === 'speeding'
+                ? 'bg-accent animate-ping'
+                : animPhase === 'decelerating'
                   ? 'bg-amber-500 animate-pulse'
                   : animPhase === 'landing'
-                  ? 'bg-primary animate-ping'
-                  : isRevealed
-                  ? 'bg-primary'
-                  : 'bg-muted-foreground/40'
-              }`}
+                    ? 'bg-primary animate-ping'
+                    : isRevealed
+                      ? 'bg-primary'
+                      : 'bg-muted-foreground/40'
+                }`}
             />
             {animPhase === 'speeding'
               ? 'Speeding up... calculating cash flow...'
               : animPhase === 'decelerating'
-              ? 'Decelerating towards target...'
-              : animPhase === 'landing'
-              ? 'Slowly arriving at exact final figure...'
-              : justLanded
-              ? 'Monthly allowance locked in!'
-              : isRevealed
-              ? `Guilt-free spending at ${parameters.safeWithdrawalRate}% SWR`
-              : 'Click to reveal monthly safe allowance'}
+                ? 'Decelerating towards target...'
+                : animPhase === 'landing'
+                  ? 'Slowly arriving at exact final figure...'
+                  : justLanded
+                    ? 'Monthly allowance locked in!'
+                    : isRevealed
+                      ? `Guilt-free spending at ${parameters.safeWithdrawalRate}% SWR`
+                      : 'Click to reveal monthly safe allowance'}
           </p>
         </div>
 
