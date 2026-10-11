@@ -15,6 +15,7 @@ import { FireHero } from './FireHero';
 import { FireChart } from './FireChart';
 import { FireControls } from './FireControls';
 import { FireMilestones } from './FireMilestones';
+import { WifeReassuranceSection } from './WifeReassuranceSection';
 import { SkeletonChart } from '@/components/common/LoadingSpinner';
 import { ErrorDisplay } from '@/components/common/ErrorBoundary';
 
@@ -126,6 +127,12 @@ export const FireDashboard: React.FC = () => {
         parameters={parameters}
         onParametersChange={setParameters}
         liveTotalInvestmentValue={liveTotalInvestmentValue}
+      />
+
+      {/* Humorous Wife Reassurance Section */}
+      <WifeReassuranceSection
+        parameters={parameters}
+        calculation={calculation}
       />
     </div>
   );
