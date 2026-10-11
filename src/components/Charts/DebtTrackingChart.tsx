@@ -239,7 +239,7 @@ export const DebtTrackingChart: React.FC<DebtTrackingChartProps> = ({
           font: {
             size: 10,
           },
-          maxTicksLimit: 6,
+          maxTicksLimit: 12,
         },
         grid: {
           display: true,

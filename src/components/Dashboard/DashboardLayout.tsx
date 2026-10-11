@@ -12,7 +12,6 @@ import { ChartGrid, ChartSection } from './ChartGrid';
 import { AssetAllocationChart } from '@/components/Charts/AssetAllocationChart';
 import { AssetGrowthChart } from '@/components/Charts/AssetGrowthChart';
 import { DebtTrackingChart } from '@/components/Charts/DebtTrackingChart';
-import { DebtCompositionChart } from '@/components/Charts/DebtCompositionChart';
 import { InvestmentDashboard } from './InvestmentDashboard';
 import { ProjectionSection } from './ProjectionSection';
 
@@ -131,17 +130,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
             >
               <ChartSection
                 title="Debt Analysis"
-                description="Track your debt reduction progress and composition"
+                description="Track your debt reduction progress"
                 className="mb-8"
               >
-                <ChartGrid columns={2}>
-                  <DebtTrackingChart
-                    data={data?.entries || []}
-                    selectedPeriod={selectedPeriod}
-                    isLoading={loading}
-                  />
-                  <DebtCompositionChart data={data?.entries || []} isLoading={loading} />
-                </ChartGrid>
+                <DebtTrackingChart
+                  data={data?.entries || []}
+                  selectedPeriod={selectedPeriod}
+                  isLoading={loading}
+                />
               </ChartSection>
             </div>
 

@@ -249,10 +249,6 @@ export interface InvestmentVelocityCardProps {
   isLoading: boolean;
 }
 
-export interface InvestmentPerformanceCardsProps {
-  analytics: InvestmentAnalytics;
-  isLoading: boolean;
-}
 
 export interface InvestmentDashboardProps {
   data: NetWorthEntry[];
