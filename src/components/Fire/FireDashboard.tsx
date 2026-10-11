@@ -37,7 +37,7 @@ export const FireDashboard: React.FC = () => {
   const [parameters, setParameters] = useState<FireParameters>({
     currentPortfolio: 0,
     monthlyExpense: 30000,
-    yearlyExpense: 400000,
+    yearlyExpense: 360000,
     expectedAnnualReturn: 13.0,
     inflationRate: 6.0,
     safeWithdrawalRate: 4.0,

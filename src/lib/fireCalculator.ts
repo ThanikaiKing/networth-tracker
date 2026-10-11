@@ -45,7 +45,11 @@ export function calculateFire(params: FireParameters): FireCalculationResult {
   const swrMultiplier = swr > 0 ? 1 / swr : 25;
 
   // 2. Base FIRE targets (in today's purchasing power)
-  const effectiveYearlyExpense = yearlyExpense > 0 ? yearlyExpense : monthlyExpense * 12;
+  const effectiveMonthlyExpense = monthlyExpense > 0 ? monthlyExpense : Math.round(yearlyExpense / 12);
+  const effectiveYearlyExpense =
+    yearlyExpense > 0 && Math.abs(yearlyExpense - effectiveMonthlyExpense * 12) < 50
+      ? yearlyExpense
+      : effectiveMonthlyExpense * 12;
   const standardFireNumber = Math.round(effectiveYearlyExpense * swrMultiplier);
   const leanFireNumber = Math.round(standardFireNumber * 0.75); // 75% bare-bones lifestyle
   const fatFireNumber = Math.round(standardFireNumber * 1.30);  // 130% luxury & buffer
@@ -75,7 +79,7 @@ export function calculateFire(params: FireParameters): FireCalculationResult {
       tagline: 'Zero Future Savings Required',
       description: `Invested corpus today will compound to full FIRE at age ${targetRetirementAge} without adding another rupee.`,
       targetCorpus: coastFireNumber,
-      monthlyExpense: Math.round(monthlyExpense),
+      monthlyExpense: Math.round(effectiveMonthlyExpense),
       yearlyExpense: Math.round(effectiveYearlyExpense),
       progressPercentage: Math.min(
         100,
@@ -91,7 +95,7 @@ export function calculateFire(params: FireParameters): FireCalculationResult {
       tagline: 'Semi-Retirement / Passion Work',
       description: '50% of living expenses covered by investments; remaining 50% from passion projects or low-stress work.',
       targetCorpus: baristaFireNumber,
-      monthlyExpense: Math.round(monthlyExpense * 0.5),
+      monthlyExpense: Math.round(effectiveMonthlyExpense * 0.5),
       yearlyExpense: Math.round(effectiveYearlyExpense * 0.5),
       progressPercentage: Math.min(
         100,
@@ -107,7 +111,7 @@ export function calculateFire(params: FireParameters): FireCalculationResult {
       tagline: 'Essential Survival Freedom',
       description: 'Covers 75% of your current budget. Guarantees complete baseline independence and security.',
       targetCorpus: leanFireNumber,
-      monthlyExpense: Math.round(monthlyExpense * 0.75),
+      monthlyExpense: Math.round(effectiveMonthlyExpense * 0.75),
       yearlyExpense: Math.round(effectiveYearlyExpense * 0.75),
       progressPercentage: Math.min(
         100,
@@ -123,7 +127,7 @@ export function calculateFire(params: FireParameters): FireCalculationResult {
       tagline: 'Complete Lifestyle Independence',
       description: 'Fully sustains 100% of your current lifestyle indefinitely with complete work optionality.',
       targetCorpus: standardFireNumber,
-      monthlyExpense: Math.round(monthlyExpense),
+      monthlyExpense: Math.round(effectiveMonthlyExpense),
       yearlyExpense: Math.round(effectiveYearlyExpense),
       progressPercentage: Math.min(100, currentProgressPercentage),
       isAchieved: isFireAchieved,
@@ -136,7 +140,7 @@ export function calculateFire(params: FireParameters): FireCalculationResult {
       tagline: 'Abundance & Luxury Freedom',
       description: 'Provides 130% of current expenses with generous buffers for luxury travel, upgrades, and gifts.',
       targetCorpus: fatFireNumber,
-      monthlyExpense: Math.round(monthlyExpense * 1.3),
+      monthlyExpense: Math.round(effectiveMonthlyExpense * 1.3),
       yearlyExpense: Math.round(effectiveYearlyExpense * 1.3),
       progressPercentage: Math.min(
         100,
