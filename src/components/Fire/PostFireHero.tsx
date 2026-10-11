@@ -49,25 +49,25 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
   const animRef = useRef<number | null>(null);
 
   // 3-Phase dramatic speeding curve:
-  // 1. Rapid acceleration / high-speed text rush (0 -> 82%)
-  // 2. Visible deceleration (82% -> 96%)
-  // 3. Slow, dramatic countdown landing (96% -> 100%)
+  // 1. Rapid acceleration / high-speed text rush (0 -> 86% in ~1.3s)
+  // 2. Heavy deceleration braking (86% -> 97.5% in ~0.9s)
+  // 3. Ultra-slow dramatic landing countdown (97.5% -> 100% over ~1.2s!)
   const getDramaticSpeedProgress = (p: number): number => {
     if (p <= 0) return 0;
     if (p >= 1) return 1;
 
-    if (p < 0.42) {
+    if (p < 0.38) {
       // High-speed rush phase
-      const sub = p / 0.42;
-      return 0.82 * Math.sin((sub * Math.PI) / 2);
-    } else if (p < 0.72) {
+      const sub = p / 0.38;
+      return 0.86 * Math.sin((sub * Math.PI) / 2);
+    } else if (p < 0.65) {
       // Deceleration braking phase
-      const sub = (p - 0.42) / 0.3;
-      return 0.82 + (0.962 - 0.82) * Math.sin((sub * Math.PI) / 2);
+      const sub = (p - 0.38) / 0.27;
+      return 0.86 + (0.975 - 0.86) * Math.sin((sub * Math.PI) / 2);
     } else {
-      // Dramatic countdown landing phase: ticking into final number
-      const sub = (p - 0.72) / 0.28;
-      return 0.962 + (1 - 0.962) * (1 - Math.pow(1 - sub, 2.5));
+      // Ultra-slow dramatic countdown landing phase: deliberate ticks into the final number
+      const sub = (p - 0.65) / 0.35;
+      return 0.975 + (1 - 0.975) * (1 - Math.pow(1 - sub, 3.8));
     }
   };
 
@@ -79,7 +79,7 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
     setDisplayAllowance(0);
 
     const target = guiltFreeMonthlyAllowance;
-    const duration = 2600; // 2.6 seconds dramatic reveal
+    const duration = 3400; // 3.4 seconds dramatic reveal with extended slow landing
     const startTime = performance.now();
 
     if (animRef.current) {
@@ -90,9 +90,9 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
       const elapsed = currentTime - startTime;
       const progress = Math.min(1, elapsed / duration);
 
-      if (progress < 0.42) {
+      if (progress < 0.38) {
         setAnimPhase('speeding');
-      } else if (progress < 0.72) {
+      } else if (progress < 0.65) {
         setAnimPhase('decelerating');
       } else {
         setAnimPhase('landing');
@@ -112,8 +112,8 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
         setJustLanded(true);
         animRef.current = null;
 
-        // Reset justLanded sparkle after 2 seconds
-        setTimeout(() => setJustLanded(false), 2000);
+        // Reset justLanded sparkle after 2.5 seconds
+        setTimeout(() => setJustLanded(false), 2500);
       }
     };
 
@@ -317,7 +317,7 @@ export const PostFireHero: React.FC<PostFireHeroProps> = ({
               : animPhase === 'decelerating'
               ? 'Decelerating towards target...'
               : animPhase === 'landing'
-              ? 'Landing at exact monthly allowance...'
+              ? 'Slowly arriving at exact final figure...'
               : justLanded
               ? 'Monthly allowance locked in!'
               : isRevealed
