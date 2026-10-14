@@ -113,12 +113,6 @@ export const FireDashboard: React.FC = () => {
         <FireChart calculation={calculation} />
       )}
 
-      {/* Post-FIRE Freedom Metrics (Simulator & Surplus Engine) */}
-      <PostFireFreedomMetrics calculation={calculation} />
-
-      {/* Market Crash & Anti-Fragility Stress-Test */}
-      <PostFireStressTest calculation={calculation} />
-
       {/* 5-Tier Milestone Spectrum */}
       <FireMilestones calculation={calculation} />
 
@@ -128,6 +122,12 @@ export const FireDashboard: React.FC = () => {
         onParametersChange={setParameters}
         liveTotalInvestmentValue={liveTotalInvestmentValue}
       />
+
+      {/* Post-FIRE Freedom Metrics (Simulator & Surplus Engine) */}
+      <PostFireFreedomMetrics calculation={calculation} />
+
+      {/* Market Crash & Anti-Fragility Stress-Test */}
+      <PostFireStressTest calculation={calculation} />
 
       {/* Humorous Wife Reassurance Section */}
       <WifeReassuranceSection
